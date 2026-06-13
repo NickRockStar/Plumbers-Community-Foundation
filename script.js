@@ -31,15 +31,39 @@ window.addEventListener('scroll', () => {
 
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-document.getElementById('contactForm').addEventListener('submit', function(e) {
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    this.reset();
-    toastText.textContent = 'Спасибо! Сообщение отправлено.';
-    toast.show();
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('send-mail.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-primary');
+        if (result.success) {
+            this.reset();
+            toastEl.classList.add('text-bg-success');
+            toastText.textContent = 'Сообщение отправлено на почту.';
+        } else {
+            toastEl.classList.add('text-bg-danger');
+            toastText.textContent = result.message || 'Ошибка отправки сообщения.';
+        }
+        toast.show();
+    } catch (error) {
+        toastEl.classList.remove('text-bg-success', 'text-bg-primary');
+        toastEl.classList.add('text-bg-danger');
+        toastText.textContent = 'Сервер недоступен или PHP-обработчик не найден.';
+        toast.show();
+    }
 });
 
 function donate() {
-    toastEl.classList.remove('text-bg-success');
+    toastEl.classList.remove('text-bg-success', 'text-bg-danger');
     toastEl.classList.add('text-bg-primary');
     toastText.textContent = 'Переход к форме пожертвований (YooMoney/Sber).';
     toast.show();
