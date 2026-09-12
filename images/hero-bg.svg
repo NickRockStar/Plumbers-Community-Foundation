@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2070" height="1280" viewBox="0 0 2070 1280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1e3a"/>
+      <stop offset=".5" stop-color="#10315c"/>
+      <stop offset="1" stop-color="#0d6efd"/>
+    </linearGradient>
+    <linearGradient id="pipe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2aa8ff"/>
+      <stop offset="1" stop-color="#0d6efd"/>
+    </linearGradient>
+  </defs>
+  <rect width="2070" height="1280" fill="url(#bg)"/>
+  <g opacity=".14" stroke="#8fd0ff" stroke-width="34" fill="none" stroke-linecap="round">
+    <path d="M-50 1050 H560 q90 0 90-90 V640 q0-90 90-90 H1900"/>
+    <path d="M-50 1190 H860 q90 0 90-90 V860 q0-90 90-90 H1900"/>
+  </g>
+  <g fill="none" stroke="#2aa8ff" stroke-width="22" stroke-linecap="round" opacity=".9" transform="translate(1700,320) rotate(45)">
+    <path d="M-90 0 H90 M0 -90 V90" stroke="#fff" opacity=".85"/>
+  </g>
+  <circle cx="350" cy="260" r="130" fill="#2aa8ff" opacity=".25"/>
+  <circle cx="1750" cy="950" r="180" fill="#0d6efd" opacity=".2"/>
+  <circle cx="1200" cy="200" r="70" fill="#fff" opacity=".12"/>
+  <g transform="translate(985,540)" opacity=".92">
+    <path d="M50 40 L120 -30 A46 46 0 1 0 55 -95 L-15 -25 L-85 -95 A46 46 0 1 0 -150 -30 L-80 40 L-150 110 H-20 V40 Z" fill="url(#pipe)" stroke="#e8f4ff" stroke-width="14" stroke-linejoin="round"/>
+  </g>
+  <text x="1035" y="820" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#eaf4ff" opacity=".9">СООБЩЕСТВО САНТЕХНИКОВ</text>
+</svg>

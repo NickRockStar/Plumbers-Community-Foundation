@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640">
+  <defs>
+    <linearGradient id="t" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f2ff"/>
+      <stop offset="1" stop-color="#c7e0ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="640" fill="url(#t)"/>
+  <g transform="translate(180,170)">
+    <circle cx="80" cy="60" r="58" fill="#0d6efd"/>
+    <rect x="10" y="130" width="140" height="180" rx="40" fill="#0d6efd" opacity=".85"/>
+    <rect x="90" y="120" width="26" height="120" rx="12" fill="#9fc7ff" transform="rotate(28 103 180)"/>
+  </g>
+  <g transform="translate(460,150)">
+    <circle cx="80" cy="60" r="58" fill="#2aa8ff"/>
+    <rect x="10" y="130" width="140" height="180" rx="40" fill="#2aa8ff" opacity=".85"/>
+    <rect x="46" y="120" width="26" height="120" rx="12" fill="#eaf4ff" transform="rotate(-20 59 180)"/>
+  </g>
+  <g transform="translate(760,170)">
+    <circle cx="80" cy="60" r="58" fill="#0f172a"/>
+    <rect x="10" y="130" width="140" height="180" rx="40" fill="#0f172a" opacity=".85"/>
+    <rect x="90" y="120" width="26" height="120" rx="12" fill="#2aa8ff" transform="rotate(24 103 180)"/>
+  </g>
+  <text x="600" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#0f172a">Команда сообщества</text>
+</svg>

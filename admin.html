@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — СантехПро</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-wrap{max-width:960px;margin:32px auto 64px;padding:0 16px}
+        .item-card{border:1px solid #dbe4f0;border-radius:1rem;padding:1rem 1.25rem;background:#fff;margin-bottom:1rem}
+        .item-card.drag-over{border-color:var(--primary)}
+        .handle{cursor:grab;color:#94a3b8}
+        .toast-pos{position:fixed;bottom:18px;right:18px;z-index:1090}
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand fw-bold"><i class="fas fa-wrench me-2"></i>СантехПро — админ-панель</span>
+        <div>
+            <a href="index.html" class="btn btn-sm btn-outline-light me-2">На сайт</a>
+            <button class="btn btn-sm btn-outline-light" id="logoutBtn" hidden>Выйти</button>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-wrap" id="loginView">
+    <div class="glass-card p-4 p-md-5 mx-auto" style="max-width:420px">
+        <h4 class="mb-3"><i class="fas fa-lock me-2"></i>Вход в админ-панель</h4>
+        <form id="loginForm">
+            <div class="mb-3">
+                <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Пароль" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary w-100" id="loginSubmit">Войти</button>
+            <div class="alert alert-danger mt-3 mb-0 d-none" id="loginError" role="alert"></div>
+        </form>
+    </div>
+</div>
+
+<div class="admin-wrap" id="panelView" hidden>
+    <ul class="nav nav-pills mb-4 justify-content-center" id="tabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-about" type="button">О нас</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-projects" type="button">Проекты и мероприятия</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-news" type="button">Новости</button></li>
+    </ul>
+
+    <!-- О нас -->
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-about">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted small">Карточки раздела «О нас»</span>
+                <button class="btn btn-primary btn-sm" data-add="about"><i class="fas fa-plus me-1"></i>Добавить</button>
+            </div>
+            <div id="list-about"></div>
+            <button class="btn btn-success mt-2" data-save="about"><i class="fas fa-save me-1"></i>Сохранить «О нас»</button>
+        </div>
+
+        <!-- Проекты -->
+        <div class="tab-pane fade" id="tab-projects">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted small">Карточки проектов и мероприятий (карточка «Партнёры» не редактируется здесь)</span>
+                <button class="btn btn-primary btn-sm" data-add="projects"><i class="fas fa-plus me-1"></i>Добавить</button>
+            </div>
+            <div id="list-projects"></div>
+            <button class="btn btn-success mt-2" data-save="projects"><i class="fas fa-save me-1"></i>Сохранить «Проекты»</button>
+        </div>
+
+        <!-- Новости -->
+        <div class="tab-pane fade" id="tab-news">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted small">Новости показываются на сайте в этом порядке (сверху — самые свежие)</span>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" id="importRssBtn" title="Подтянуть свежие отраслевые новости"><i class="fas fa-rss me-1"></i>Импорт RSS</button>
+                    <button class="btn btn-primary btn-sm" data-add="news"><i class="fas fa-plus me-1"></i>Добавить</button>
+                </div>
+            </div>
+            <div id="list-news"></div>
+            <button class="btn btn-success mt-2" data-save="news"><i class="fas fa-save me-1"></i>Сохранить «Новости»</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-pos">
+    <div id="adminToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex"><div class="toast-body" id="adminToastText">Готово</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const FIELDS = {
+    about: [
+        {key: 'title', label: 'Заголовок'},
+        {key: 'text', label: 'Текст', type: 'textarea'},
+        {key: 'link.text', label: 'Текст ссылки (необязательно)'},
+        {key: 'linkValue', label: 'Ссылка: #ustavModal для устава или https://… (необязательно)'}
+    ],
+    projects: [
+        {key: 'title', label: 'Заголовок'},
+        {key: 'text', label: 'Описание', type: 'textarea'},
+        {key: 'badge.text', label: 'Текст бейджа (необязательно)'},
+        {key: 'badge.type', label: 'Цвет бейджа', type: 'select', options: ['primary','success','warning','danger','info','secondary']},
+        {key: 'image', label: 'Картинка (путь или URL, напр. images/master-class.svg)'},
+        {key: 'link', label: 'Ссылка «Подробнее» https://… (необязательно)'}
+    ],
+    news: [
+        {key: 'title', label: 'Заголовок'},
+        {key: 'description', label: 'Описание', type: 'textarea'},
+        {key: 'date', label: 'Дата (ГГГГ-ММ-ЧЧ)'},
+        {key: 'link', label: 'Ссылка «Читать» https://… (необязательно)'},
+        {key: 'source.name', label: 'Источник — название (напр. РБК)'},
+        {key: 'source.link', label: 'Источник — ссылка https://… (необязательно)'}
+    ]
+};
+const state = {about: [], projects: [], news: []};
+const toastEl = document.getElementById('adminToast');
+const toastText = document.getElementById('adminToastText');
+const toast = bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 2500});
+const notify = (msg, ok = true) => {
+    toastEl.classList.remove('text-bg-success', 'text-bg-danger');
+    toastEl.classList.add(ok ? 'text-bg-success' : 'text-bg-danger');
+    toastText.textContent = msg;
+    toast.show();
+};
+
+const get = (obj, path) => path.split('.').reduce((o, k) => (o || {})[k], obj);
+const set = (obj, path, val) => {
+    const keys = path.split('.');
+    let o = obj;
+    while (keys.length > 1) { const k = keys.shift(); o[k] = o[k] || {}; o = o[k]; }
+    o[keys[0]] = val;
+};
+
+function itemForm(section, index) {
+    const item = state[section][index];
+    const linkVal = item.link?.modal || item.link?.href || item.link || '';
+    const src = {...item, linkValue: linkVal};
+    const controls = FIELDS[section].map(f => {
+        const val = f.key === 'linkValue' ? src.linkValue : get(src, f.key) ?? '';
+        if (f.type === 'textarea') {
+            return `<div class="mb-2"><label class="form-label small mb-1">${f.label}</label><textarea class="form-control" rows="3" data-k="${f.key}">${val}</textarea></div>`;
+        }
+        if (f.type === 'select') {
+            const opts = f.options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('');
+            return `<div class="mb-2"><label class="form-label small mb-1">${f.label}</label><select class="form-select" data-k="${f.key}">${opts}</select></div>`;
+        }
+        return `<div class="mb-2"><label class="form-label small mb-1">${f.label}</label><input class="form-control" data-k="${f.key}" value="${String(val).replace(/"/g, '&quot;')}"></div>`;
+    }).join('');
+    return `
+    <div class="item-card" data-i="${index}">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="fas fa-grip-vertical handle"></i>
+            <strong class="item-title">${item.title ? item.title : '(без заголовка)'}</strong>
+            <div class="ms-auto d-flex gap-1">
+                <button class="btn btn-outline-secondary btn-sm" data-move="up" title="Выше"><i class="fas fa-arrow-up"></i></button>
+                <button class="btn btn-outline-secondary btn-sm" data-move="down" title="Ниже"><i class="fas fa-arrow-down"></i></button>
+                <button class="btn btn-outline-danger btn-sm" data-del="${index}"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        ${controls}
+    </div>`;
+}
+
+function renderSection(section) {
+    const list = document.getElementById('list-' + section);
+    list.innerHTML = state[section].length
+        ? state[section].map((_, i) => itemForm(section, i)).join('')
+        : '<div class="alert alert-light text-muted mb-0">Пока нет ни одного блока — нажмите «Добавить».</div>';
+}
+
+function renderAll() { ['about', 'projects', 'news'].forEach(renderSection); }
+
+// Collect form values back into state before save
+function collect(section) {
+    document.querySelectorAll(`#list-${section} .item-card`).forEach(card => {
+        const i = +card.dataset.i;
+        card.querySelectorAll('[data-k]').forEach(input => {
+            const k = input.dataset.k;
+            let v = input.value.trim();
+            if (k === 'linkValue') {
+                const linkTextInput = card.querySelector('[data-k="link.text"]');
+                const linkText = linkTextInput ? linkTextInput.value.trim() : '';
+                delete state[section][i].link;
+                if (v) {
+                    state[section][i].link = v.startsWith('#') ? {text: linkText || 'Открыть', modal: v} : v;
+                }
+            } else {
+                set(state[section][i], k, v);
+            }
+        });
+    });
+}
+
+async function api(action, params = {}) {
+    const body = new URLSearchParams(params);
+    const res = await fetch('admin-api.php?action=' + action, {method: 'POST', body, redirect: 'error'});
+    return {status: res.status, data: await res.json().catch(() => ({success: false, message: 'Ошибка ответа сервера'}))};
+}
+
+function showPanel(show) {
+    document.getElementById('loginView').hidden = show;
+    document.getElementById('panelView').hidden = !show;
+    document.getElementById('logoutBtn').hidden = !show;
+}
+
+document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = document.getElementById('loginError');
+    err.classList.add('d-none');
+    const {data} = await api('login', {password: document.getElementById('passwordInput').value});
+    if (data.success) { await loadData(); showPanel(true); }
+    else { err.textContent = data.message || 'Ошибка входа'; err.classList.remove('d-none'); }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await api('logout'); showPanel(false); location.reload();
+});
+
+async function loadData() {
+    const res = await fetch('admin-api.php?action=data');
+    const {data} = await res.json();
+    if (data) { state.about = data.about || []; state.projects = data.projects || []; state.news = data.news || []; renderAll(); }
+}
+
+document.addEventListener('click', async e => {
+    const addBtn = e.target.closest('[data-add]');
+    if (addBtn) {
+        const s = addBtn.dataset.add;
+        const blank = s === 'news' ? {title: '', description: '', date: new Date().toISOString().slice(0, 10), link: '', source: {name: '', link: ''}}
+                     : s === 'projects' ? {title: '', text: '', image: 'images/master-class.svg'}
+                     : {title: '', text: ''};
+        state[s].unshift(blank);
+        renderSection(s);
+        return;
+    }
+    const delBtn = e.target.closest('[data-del]');
+    if (delBtn) {
+        const section = delBtn.closest('[id^="list-"]').id.replace('list-', '');
+        if (confirm('Удалить этот блок?')) {
+            collect(section);
+            state[section].splice(+delBtn.dataset.del, 1);
+            renderSection(section);
+        }
+        return;
+    }
+    const moveBtn = e.target.closest('[data-move]');
+    if (moveBtn) {
+        const section = moveBtn.closest('[id^="list-"]').id.replace('list-', '');
+        const card = moveBtn.closest('.item-card');
+        const i = +card.dataset.i;
+        const j = moveBtn.dataset.move === 'up' ? i - 1 : i + 1;
+        if (j < 0 || j >= state[section].length) return;
+        collect(section);
+        [state[section][i], state[section][j]] = [state[section][j], state[section][i]];
+        renderSection(section);
+        return;
+    }
+    const saveBtn = e.target.closest('[data-save]');
+    if (saveBtn) {
+        const s = saveBtn.dataset.save;
+        collect(s);
+        saveBtn.disabled = true;
+        const {status, data} = await api('save', {section: s, items: JSON.stringify(state[s])});
+        saveBtn.disabled = false;
+        if (data.success) { notify(`Сохранено: ${data.saved} блок(ов). На сайте изменения уже видны.`); renderSection(s); }
+        else notify(data.message || 'Ошибка сохранения', false);
+    }
+});
+
+document.getElementById('importRssBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('importRssBtn');
+    btn.disabled = true;
+    const res = await fetch('admin-api.php?action=rss');
+    const {data} = await res.json();
+    btn.disabled = false;
+    if (!data.success || !data.items?.length) { notify('Ленты недоступны, попробуйте позже', false); return; }
+    const existing = new Set(state.news.map(n => n.title));
+    const fresh = data.items.filter(it => !existing.has(it.title))
+        .map(it => {
+            let host = '';
+            try { host = new URL(it.link).hostname.replace(/^www\./, ''); } catch (e) {}
+            return {title: it.title, description: it.description, date: it.date, link: it.link,
+                    source: {name: host || 'По ссылке', link: it.link}};
+        });
+    if (!fresh.length) { notify('Все свежие новости уже добавлены'); return; }
+    state.news = [...fresh, ...state.news].slice(0, 50);
+    renderSection('news');
+    notify(`Добавлено ${fresh.length} новост(ей). Проверьте список и нажмите «Сохранить». Нажмите «Сохранить», чтобы применить.`);
+});
+
+(async () => {
+    const res = await fetch('admin-api.php?action=state');
+    const {loggedIn} = await res.json();
+    if (loggedIn) { await loadData(); showPanel(true); }
+})();
+</script>
+</body>
+</html>

@@ -26,6 +26,24 @@ if ($name === '' || $email === '' || $message === '') {
     exit;
 }
 
+if (($_POST['consent'] ?? '') !== 'on') {
+    echo json_encode(['success' => false, 'message' => 'Необходимо согласие на обработку персональных данных.']);
+    exit;
+}
+
+// Evidence of consent for FZ-152 (art. 9): timestamp + sender email, kept 3 years (see politika.html)
+$storageDir = __DIR__ . '/storage';
+if (!is_dir($storageDir)) {
+    @mkdir($storageDir, 0775, true);
+}
+$consentEntry = json_encode([
+    'consent_at' => date('c'),
+    'form' => 'contact',
+    'email' => $email,
+    'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+], JSON_UNESCAPED_UNICODE) . PHP_EOL;
+@file_put_contents($storageDir . '/consent-log.jsonl', $consentEntry, FILE_APPEND | LOCK_EX);
+
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'message' => 'Некорректный email.']);
     exit;
@@ -39,6 +57,11 @@ $smtpPassword = $_ENV['SMTP_PASSWORD'] ?? '';
 $mailFrom = $_ENV['MAIL_FROM'] ?? $smtpUsername;
 $mailFromName = $_ENV['MAIL_FROM_NAME'] ?? 'СантехПро';
 $mailTo = $_ENV['MAIL_TO'] ?? $smtpUsername;
+
+if ($smtpHost === '' || $smtpUsername === '' || $smtpPassword === '') {
+    echo json_encode(['success' => false, 'message' => 'SMTP не настроен: заполните .env (см. .env.example).']);
+    exit;
+}
 
 $mail = new PHPMailer(true);
 

@@ -1,0 +1,3 @@
+# Deny web access to consent log with personal data
+Order deny,allow
+Deny from all
