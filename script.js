@@ -48,7 +48,8 @@ function escapeHtml(str) {
 }
 
 async function loadJson(file) {
-    const response = await fetch(file);
+    // cache: no-store — после сохранения в админке сайт сразу видит свежие данные
+    const response = await fetch(file, { cache: 'no-store' });
     if (!response.ok) throw new Error('HTTP ' + response.status);
     return response.json();
 }

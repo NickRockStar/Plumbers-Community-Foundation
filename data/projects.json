@@ -1,5 +1,14 @@
 [
     {
+        "title": "Команда",
+        "text": "Наша команда",
+        "image": "images\/project-team.svg",
+        "badge": {
+            "text": "КОМАНДА",
+            "type": "danger"
+        }
+    },
+    {
         "title": "Тест внешней картинки",
         "text": "Проверка URL",
         "image": "https:\/\/www.shutterstock.com\/shutterstock\/photos\/705650296\/display_1500\/stock-vector-sewerage-water-system-flat-design-705650296.jpg",
@@ -26,15 +35,6 @@
         "title": "Инструменты",
         "text": "Наши инструменты",
         "image": "images\/instruments.svg"
-    },
-    {
-        "title": "Команда",
-        "text": "Мы собрались и нажрались !.",
-        "image": "images\/team.svg",
-        "badge": {
-            "text": "БУХАЛОВО",
-            "type": "danger"
-        }
     },
     {
         "title": "Благотворительность",
