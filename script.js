@@ -322,7 +322,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
     } catch (error) {
         toastEl.classList.remove('text-bg-success', 'text-bg-primary');
         toastEl.classList.add('text-bg-danger');
-        toastText.textContent = 'Сервер недоступен или PHP-обработчик не найден.';
+        toastText.textContent = 'Не удалось связаться с сервером. Проверьте, что PHP-сервер запущен, и попробуйте ещё раз.';
         toast.show();
     }
 });

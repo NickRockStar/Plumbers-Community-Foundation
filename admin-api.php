@@ -172,7 +172,8 @@ if ($action === 'rss') {
         $items = rssItems(6);
         jsonOut(['success' => true, 'items' => $items]);
     } catch (Throwable $e) {
-        jsonOut(['success' => false, 'message' => 'Не удалось получить ленты: ' . $e->getMessage()]);
+        error_log('[admin-api] rss: ' . $e->getMessage());
+        jsonOut(['success' => false, 'message' => 'Ленты новостей временно недоступны. Попробуйте позже.']);
     }
 }
 

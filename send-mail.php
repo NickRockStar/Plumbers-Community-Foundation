@@ -80,6 +80,21 @@ if ($smtpHost === '' || $smtpUsername === '' || $smtpPassword === '') {
 
 $mail = new PHPMailer(true);
 
+// Понятное пользователю описание сбоя SMTP; технические детали уходят в error_log
+function smtpUserError(string $err): string {
+    $e = mb_strtolower($err);
+    if (str_contains($e, 'authenticate') || str_contains($e, 'password') || str_contains($e, 'credentials') || str_contains($e, 'username')) {
+        return 'Не удалось войти на почтовый сервер: проверьте SMTP_USERNAME и SMTP_PASSWORD в .env.';
+    }
+    if (str_contains($e, 'connect') || str_contains($e, 'timed out') || str_contains($e, 'timeout') || str_contains($e, 'resolve') || str_contains($e, 'network')) {
+        return 'Почтовый сервер недоступен: проверьте SMTP_HOST и SMTP_PORT в .env и подключение к интернету.';
+    }
+    if (str_contains($e, 'sender') || str_contains($e, 'from address') || str_contains($e, 'denied') || str_contains($e, 'spam')) {
+        return 'Почтовый сервер отклонил отправителя: проверьте MAIL_FROM в .env.';
+    }
+    return 'Не удалось отправить сообщение через почтовый сервер. Попробуйте позже.';
+}
+
 try {
     $mail->isSMTP();
     $mail->Host = $smtpHost;
@@ -107,5 +122,6 @@ try {
 
     echo json_encode(['success' => true]);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Ошибка отправки через SMTP: ' . $mail->ErrorInfo]);
+    error_log('[send-mail] PHPMailer: ' . $mail->ErrorInfo);
+    echo json_encode(['success' => false, 'message' => smtpUserError($mail->ErrorInfo)]);
 }

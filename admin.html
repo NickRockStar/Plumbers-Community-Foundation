@@ -246,7 +246,7 @@ async function api(action, params = {}) {
         // страница открыта без PHP: сервер отдал исходник admin-api.php или HTML-ошибку
         return {status: res.status, data: {success: false, message: 'PHP не выполняет скрипты: сайт открыт без PHP-сервера (например, через превью IDE). Запустите в папке сайта: php -S localhost:8080 и откройте http://localhost:8080/admin.html'}};
     }
-    return {status: res.status, data: await res.json().catch(() => ({success: false, message: 'Ошибка ответа сервера (HTTP ' + res.status + ')'}))};
+    return {status: res.status, data: await res.json().catch(() => ({success: false, message: `Сервер вернул ошибку HTTP ${res.status}. Попробуйте повторить позже.`}))};
 }
 
 function showPanel(show) {
@@ -269,9 +269,20 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 });
 
 async function loadData() {
-    const res = await fetch('admin-api.php?action=data');
-    const {data} = await res.json();
-    if (data) { state.about = data.about || []; state.projects = data.projects || []; state.news = data.news || []; renderAll(); }
+    try {
+        const res = await fetch('admin-api.php?action=data');
+        const {success, data, message} = await res.json();
+        if (success && data) {
+            state.about = data.about || [];
+            state.projects = data.projects || [];
+            state.news = data.news || [];
+            renderAll();
+        } else {
+            notify(message || 'Не удалось загрузить данные. Обновите страницу.', false);
+        }
+    } catch (e) {
+        notify('Не удалось загрузить данные. Обновите страницу.', false);
+    }
 }
 
 document.addEventListener('click', async e => {
