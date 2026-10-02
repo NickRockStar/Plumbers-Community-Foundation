@@ -288,6 +288,22 @@ function updateMessageCounter() {
 }
 messageInput?.addEventListener('input', updateMessageCounter);
 
+// Попап-уведомление о результате отправки формы «Контакты»
+const contactModalEl = document.getElementById('contactResultModal');
+const contactModal = contactModalEl ? bootstrap.Modal.getOrCreateInstance(contactModalEl) : null;
+function showContactModal(ok, title, text) {
+    if (!contactModal) return;
+    const icon = document.getElementById('contactModalIcon');
+    if (icon) {
+        icon.className = 'contact-modal-icon ' + (ok ? 'ok' : 'err');
+        const iconI = icon.querySelector('i');
+        if (iconI) iconI.className = 'fas ' + (ok ? 'fa-check' : 'fa-triangle-exclamation') + ' fa-2x';
+    }
+    document.getElementById('contactModalTitle').textContent = title;
+    document.getElementById('contactModalText').textContent = text;
+    contactModal.show();
+}
+
 document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -307,23 +323,16 @@ document.getElementById('contactForm').addEventListener('submit', async function
 
         const result = await response.json();
 
-        toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-primary');
         if (result.success) {
             this.reset();
             this.classList.remove('was-validated');
             updateMessageCounter();
-            toastEl.classList.add('text-bg-success');
-            toastText.textContent = 'Сообщение отправлено на почту.';
+            showContactModal(true, 'Сообщение отправлено!', 'Мы получили ваше обращение и ответим на указанную почту.');
         } else {
-            toastEl.classList.add('text-bg-danger');
-            toastText.textContent = result.message || 'Ошибка отправки сообщения.';
+            showContactModal(false, 'Сообщение не отправлено', result.message || 'Ошибка отправки. Попробуйте позже.');
         }
-        toast.show();
     } catch (error) {
-        toastEl.classList.remove('text-bg-success', 'text-bg-primary');
-        toastEl.classList.add('text-bg-danger');
-        toastText.textContent = 'Не удалось связаться с сервером. Проверьте, что PHP-сервер запущен, и попробуйте ещё раз.';
-        toast.show();
+        showContactModal(false, 'Сообщение не отправлено', 'Не удалось связаться с сервером. Проверьте, что PHP-сервер запущен, и попробуйте ещё раз.');
     }
 });
 

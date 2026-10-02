@@ -200,6 +200,20 @@
         </div>
     </div>
 
+    <!-- Попап результата отправки формы «Контакты» -->
+    <div class="modal fade" id="contactResultModal" tabindex="-1" aria-labelledby="contactModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0" style="border-radius:1.25rem">
+                <div class="modal-body text-center p-4">
+                    <div class="contact-modal-icon ok" id="contactModalIcon"><i class="fas fa-check fa-2x"></i></div>
+                    <h4 class="mb-2" id="contactModalTitle">Сообщение отправлено!</h4>
+                    <p class="text-muted mb-4" id="contactModalText">Мы получили ваше обращение и ответим на указанную почту.</p>
+                    <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal">Хорошо</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
