@@ -91,6 +91,10 @@
             <div class="row g-4" id="newsContainer">
                 <div class="col-12 text-center py-5" id="newsLoader"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div><p class="text-muted mt-3 mb-0">Загружаем новости...</p></div>
             </div>
+            <nav aria-label="Страницы новостей" class="mt-5 d-none" id="newsPagination"></nav>
+            <div class="text-center mt-5 reveal">
+                <a href="novosti.html" class="btn btn-outline-primary btn-lg"><i class="fas fa-newspaper me-2"></i>Все новости</a>
+            </div>
         </div>
     </section>
 
@@ -114,15 +118,33 @@
                 <div class="col-lg-8 mx-auto reveal">
                     <div class="glass-card p-4 p-md-5">
                         <!-- Developer note: contact form sends data to send-mail.php via PHPMailer SMTP -->
-                        <form id="contactForm">
+                        <form id="contactForm" novalidate>
                             <div class="row g-3">
-                                <div class="col-md-6"><input type="text" class="form-control" name="name" placeholder="Имя" required></div>
-                                <div class="col-md-6"><input type="email" class="form-control" name="email" placeholder="Email" required></div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="name" placeholder="Имя" required autocomplete="name">
+                                    <div class="invalid-feedback">Укажите имя.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="email" class="form-control" name="email" placeholder="Email" required autocomplete="email">
+                                    <div class="invalid-feedback">Укажите корректный email.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="tel" class="form-control" name="phone" placeholder="Телефон" required autocomplete="tel"
+                                           maxlength="20" pattern="^[\d\s\-\(\)\+]{10,20}$" title="Например: +7 (999) 123-45-67">
+                                    <div class="invalid-feedback">Укажите телефон: от 10 до 15 цифр, например +7 (999) 123-45-67.</div>
+                                </div>
                             </div>
-                            <div class="mt-3"><textarea class="form-control" name="message" rows="5" placeholder="Сообщение" required></textarea></div>
+                            <div class="mt-3">
+                                <textarea class="form-control" name="message" rows="5" placeholder="Сообщение" required maxlength="300"></textarea>
+                                <div class="d-flex justify-content-end mt-1">
+                                    <small class="text-muted" id="messageCounter">0/300</small>
+                                </div>
+                                <div class="invalid-feedback">Напишите сообщение.</div>
+                            </div>
                             <div class="form-check mt-3">
                                 <input class="form-check-input" type="checkbox" name="consent" id="consentCheck" required>
                                 <label class="form-check-label small" for="consentCheck">Я согласен(на) на обработку персональных данных в соответствии с <a href="politika.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></label>
+                                <div class="invalid-feedback">Отметьте согласие на обработку данных.</div>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 mt-4">Отправить</button>
                         </form>
@@ -137,7 +159,7 @@
             <p class="mb-1">&copy; 2026 Сообщество Сантехников. Все права защищены.</p>
             <!-- TODO(владелец): после регистрации НКО впишите реальные реквизиты вместо заглушек -->
             <p class="mb-1 small opacity-75">Сообщество сантехников «СантехПро» &middot; ИНН 0000000000 &middot; ОГРН 0000000000000 &middot; г. Москва</p>
-            <p class="mb-0 small"><a href="politika.html" class="text-decoration-none">Политика обработки персональных данных</a> &middot; <a href="mailto:Akela.R1@yandex.ru" class="text-decoration-none">Akela.R1@yandex.ru</a></p>
+            <p class="mb-0 small"><a href="novosti.html" class="text-decoration-none">Новости</a> &middot; <a href="politika.html" class="text-decoration-none">Политика обработки персональных данных</a> &middot; <a href="mailto:Akela.R1@yandex.ru" class="text-decoration-none">Akela.R1@yandex.ru</a></p>
         </div>
     </footer>
 

@@ -49,35 +49,39 @@
     <!-- О нас -->
     <div class="tab-content">
         <div class="tab-pane fade show active" id="tab-about">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <span class="text-muted small">Карточки раздела «О нас»</span>
-                <button class="btn btn-primary btn-sm" data-add="about"><i class="fas fa-plus me-1"></i>Добавить</button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" data-add="about"><i class="fas fa-plus me-1"></i>Добавить</button>
+                    <button class="btn btn-success btn-sm" data-save="about"><i class="fas fa-save me-1"></i>Сохранить «О нас»</button>
+                </div>
             </div>
             <div id="list-about"></div>
-            <button class="btn btn-success mt-2" data-save="about"><i class="fas fa-save me-1"></i>Сохранить «О нас»</button>
         </div>
 
         <!-- Проекты -->
         <div class="tab-pane fade" id="tab-projects">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <span class="text-muted small">Карточки проектов и мероприятий (карточка «Партнёры» не редактируется здесь)</span>
-                <button class="btn btn-primary btn-sm" data-add="projects"><i class="fas fa-plus me-1"></i>Добавить</button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" data-add="projects"><i class="fas fa-plus me-1"></i>Добавить</button>
+                    <button class="btn btn-success btn-sm" data-save="projects"><i class="fas fa-save me-1"></i>Сохранить «Проекты»</button>
+                </div>
             </div>
             <div id="list-projects"></div>
-            <button class="btn btn-success mt-2" data-save="projects"><i class="fas fa-save me-1"></i>Сохранить «Проекты»</button>
         </div>
 
         <!-- Новости -->
         <div class="tab-pane fade" id="tab-news">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <span class="text-muted small">Новости показываются на сайте в этом порядке (сверху — самые свежие)</span>
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-primary btn-sm" id="importRssBtn" title="Подтянуть свежие отраслевые новости"><i class="fas fa-rss me-1"></i>Импорт RSS</button>
                     <button class="btn btn-primary btn-sm" data-add="news"><i class="fas fa-plus me-1"></i>Добавить</button>
+                    <button class="btn btn-success btn-sm" data-save="news"><i class="fas fa-save me-1"></i>Сохранить «Новости»</button>
                 </div>
             </div>
             <div id="list-news"></div>
-            <button class="btn btn-success mt-2" data-save="news"><i class="fas fa-save me-1"></i>Сохранить «Новости»</button>
         </div>
     </div>
 </div>
@@ -91,24 +95,36 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// max — лимит символов: совпадает с truncate-лимитами в admin-api.php и показывает счётчик в форме
 const FIELDS = {
     about: [
-        {key: 'title', label: 'Заголовок'},
-        {key: 'text', label: 'Текст', type: 'textarea'},
+        {key: 'title', label: 'Заголовок', max: 100},
+        {key: 'text', label: 'Текст', type: 'textarea', max: 500},
         {key: 'link.text', label: 'Текст ссылки (необязательно)'},
         {key: 'linkValue', label: 'Ссылка: #ustavModal для устава или https://… (необязательно)'}
     ],
     projects: [
-        {key: 'title', label: 'Заголовок'},
-        {key: 'text', label: 'Описание', type: 'textarea'},
-        {key: 'badge.text', label: 'Текст бейджа (необязательно)'},
-        {key: 'badge.type', label: 'Цвет бейджа', type: 'select', options: ['primary','success','warning','danger','info','secondary']},
-        {key: 'image', label: 'Картинка (путь или URL, напр. images/master-class.svg)'},
+        {key: 'title', label: 'Заголовок', max: 100},
+        {key: 'text', label: 'Описание', type: 'textarea', max: 500},
+        {key: 'badge.text', label: 'Текст бейджа (необязательно)', max: 40},
+        {key: 'badge.type', label: 'Цвет бейджа', type: 'select', options: [
+            ['primary', 'Синий'], ['success', 'Зелёный'], ['warning', 'Жёлтый'],
+            ['danger', 'Красный'], ['info', 'Голубой'], ['secondary', 'Серый']
+        ]},
+        {key: 'image', label: 'Картинка', type: 'image', options: [
+            ['', 'Без картинки'],
+            ['images/master-class.svg', 'Мастер-класс'],
+            ['images/charity.svg', 'Благотворительность'],
+            ['images/team.svg', 'Команда'],
+            ['images/instruments.svg', 'Инструменты'],
+            ['images/water-supply.svg', 'Водоснабжение'],
+            ['images/community-meet.svg', 'Встреча сообщества'],
+        ]},
         {key: 'link', label: 'Ссылка «Подробнее» https://… (необязательно)'}
     ],
     news: [
-        {key: 'title', label: 'Заголовок'},
-        {key: 'description', label: 'Описание', type: 'textarea'},
+        {key: 'title', label: 'Заголовок', max: 150},
+        {key: 'description', label: 'Описание', type: 'textarea', max: 500},
         {key: 'date', label: 'Дата (ГГГГ-ММ-ЧЧ)'},
         {key: 'link', label: 'Ссылка «Читать» https://… (необязательно)'},
         {key: 'source.name', label: 'Источник — название (напр. РБК)'},
@@ -140,14 +156,37 @@ function itemForm(section, index) {
     const src = {...item, linkValue: linkVal};
     const controls = FIELDS[section].map(f => {
         const val = f.key === 'linkValue' ? src.linkValue : get(src, f.key) ?? '';
+        const maxAttr = f.max ? ` maxlength="${f.max}"` : '';
+        const counter = f.max ? `<span class="text-muted ms-auto" data-char-count>${String(val).length}/${f.max}</span>` : '';
+        const labelRow = `<label class="form-label small mb-1 d-flex align-baseline gap-2">${f.label}${counter}</label>`;
         if (f.type === 'textarea') {
-            return `<div class="mb-2"><label class="form-label small mb-1">${f.label}</label><textarea class="form-control" rows="3" data-k="${f.key}">${val}</textarea></div>`;
+            return `<div class="mb-2">${labelRow}<textarea class="form-control" rows="3" data-k="${f.key}"${maxAttr}>${val}</textarea></div>`;
+        }
+        if (f.type === 'image') {
+            // Готовые картинки сайта + «Другое…» для своего пути/URL; ниже — живой предпросмотр
+            const known = f.options.some(([v]) => v === val);
+            const isCustom = val !== '' && !known;
+            const valAttr = String(val).replace(/"/g, '&quot;');
+            const opts = f.options.map(([v, l]) => `<option value="${v}" ${v === val ? 'selected' : ''}>${l}</option>`).join('');
+            return `<div class="mb-2">${labelRow}
+                <select class="form-select mb-1" data-image-select>
+                    ${opts}
+                    <option value="__custom__" ${isCustom ? 'selected' : ''}>Другое…</option>
+                </select>
+                <input class="form-control form-control-sm" data-k="${f.key}" data-image-custom
+                       placeholder="images/… или https://…" value="${valAttr}" ${isCustom ? '' : 'hidden'}>
+                <img data-image-preview src="${valAttr}" alt="Предпросмотр картинки" class="rounded-3 border mt-1" style="max-width:100%;max-height:140px" ${val ? '' : 'hidden'}>
+                <div class="text-danger small mt-1" data-image-error hidden><i class="fas fa-triangle-exclamation me-1"></i>Картинка не загрузилась — проверьте путь или URL</div>
+            </div>`;
         }
         if (f.type === 'select') {
-            const opts = f.options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('');
-            return `<div class="mb-2"><label class="form-label small mb-1">${f.label}</label><select class="form-select" data-k="${f.key}">${opts}</select></div>`;
+            const opts = f.options.map(o => {
+                const [value, label] = Array.isArray(o) ? o : [o, o];
+                return `<option value="${value}" ${value === val ? 'selected' : ''}>${label}</option>`;
+            }).join('');
+            return `<div class="mb-2">${labelRow}<select class="form-select" data-k="${f.key}">${opts}</select></div>`;
         }
-        return `<div class="mb-2"><label class="form-label small mb-1">${f.label}</label><input class="form-control" data-k="${f.key}" value="${String(val).replace(/"/g, '&quot;')}"></div>`;
+        return `<div class="mb-2">${labelRow}<input class="form-control" data-k="${f.key}" value="${String(val).replace(/"/g, '&quot;')}"${maxAttr}></div>`;
     }).join('');
     return `
     <div class="item-card" data-i="${index}">
@@ -196,8 +235,18 @@ function collect(section) {
 
 async function api(action, params = {}) {
     const body = new URLSearchParams(params);
-    const res = await fetch('admin-api.php?action=' + action, {method: 'POST', body, redirect: 'error'});
-    return {status: res.status, data: await res.json().catch(() => ({success: false, message: 'Ошибка ответа сервера'}))};
+    let res;
+    try {
+        res = await fetch('admin-api.php?action=' + action, {method: 'POST', body, redirect: 'error'});
+    } catch (e) {
+        // fetch падает при file:// или если сервер вообще не запущен
+        return {status: 0, data: {success: false, message: 'Нет связи с сервером. Запустите PHP в папке сайта: php -S localhost:8080 и откройте http://localhost:8080/admin.html'}};
+    }
+    if (!(res.headers.get('content-type') || '').includes('json')) {
+        // страница открыта без PHP: сервер отдал исходник admin-api.php или HTML-ошибку
+        return {status: res.status, data: {success: false, message: 'PHP не выполняет скрипты: сайт открыт без PHP-сервера (например, через превью IDE). Запустите в папке сайта: php -S localhost:8080 и откройте http://localhost:8080/admin.html'}};
+    }
+    return {status: res.status, data: await res.json().catch(() => ({success: false, message: 'Ошибка ответа сервера (HTTP ' + res.status + ')'}))};
 }
 
 function showPanel(show) {
@@ -270,31 +319,84 @@ document.addEventListener('click', async e => {
     }
 });
 
+// Картинка проекта: пресет из списка пишет путь в поле data-k, «Другое…» открывает ручной ввод
+function refreshImagePreview(box) {
+    const input = box?.querySelector('[data-image-custom]');
+    const img = box?.querySelector('[data-image-preview]');
+    const err = box?.querySelector('[data-image-error]');
+    if (!input || !img || !err) return;
+    const src = input.value.trim();
+    img.hidden = !src;
+    err.hidden = true;
+    if (!src) return;
+    img.onload = () => { img.hidden = false; err.hidden = true; };
+    img.onerror = () => { img.hidden = true; err.hidden = false; };
+    img.src = src;
+}
+
+document.addEventListener('change', e => {
+    const select = e.target.closest('select[data-image-select]');
+    if (!select) return;
+    const box = select.closest('.mb-2');
+    const input = box?.querySelector('[data-image-custom]');
+    if (!input) return;
+    if (select.value === '__custom__') {
+        input.hidden = false;
+        input.focus();
+    } else {
+        input.value = select.value;
+        input.hidden = true;
+    }
+    refreshImagePreview(box);
+});
+
+// Живой предпросмотр при вводе своего пути/URL — с задержкой, чтобы не дёргать сеть на каждый символ
+let imagePreviewTimer = 0;
+document.addEventListener('input', e => {
+    const input = e.target.closest('[data-image-custom]');
+    if (!input) return;
+    clearTimeout(imagePreviewTimer);
+    imagePreviewTimer = setTimeout(() => refreshImagePreview(input.closest('.mb-2')), 400);
+});
+
+// Живые счётчики символов для полей с лимитом (input.maxLength === -1, если maxlength не задан)
+document.addEventListener('input', e => {
+    const input = e.target.closest('[data-k]');
+    if (!input || input.maxLength < 0) return;
+    const counter = input.closest('.mb-2')?.querySelector('[data-char-count]');
+    if (counter) counter.textContent = `${input.value.length}/${input.maxLength}`;
+});
+
 document.getElementById('importRssBtn').addEventListener('click', async () => {
     const btn = document.getElementById('importRssBtn');
     btn.disabled = true;
-    const res = await fetch('admin-api.php?action=rss');
-    const {data} = await res.json();
-    btn.disabled = false;
-    if (!data.success || !data.items?.length) { notify('Ленты недоступны, попробуйте позже', false); return; }
-    const existing = new Set(state.news.map(n => n.title));
-    const fresh = data.items.filter(it => !existing.has(it.title))
-        .map(it => {
-            let host = '';
-            try { host = new URL(it.link).hostname.replace(/^www\./, ''); } catch (e) {}
-            return {title: it.title, description: it.description, date: it.date, link: it.link,
-                    source: {name: host || 'По ссылке', link: it.link}};
-        });
-    if (!fresh.length) { notify('Все свежие новости уже добавлены'); return; }
-    state.news = [...fresh, ...state.news].slice(0, 50);
-    renderSection('news');
-    notify(`Добавлено ${fresh.length} новост(ей). Проверьте список и нажмите «Сохранить». Нажмите «Сохранить», чтобы применить.`);
+    try {
+        // api() даёт точную диагностику: PHP не запущен, открыт не через сервер и т.п.
+        const {data} = await api('rss');
+        if (!data.success) { notify(data.message || 'Ленты недоступны, попробуйте позже', false); return; }
+        if (!data.items?.length) { notify('Свежих новостей по теме сейчас нет', false); return; }
+        const existing = new Set(state.news.map(n => n.title));
+        const fresh = data.items.filter(it => !existing.has(it.title))
+            .map(it => {
+                let host = '';
+                try { host = new URL(it.link).hostname.replace(/^www\./, ''); } catch (e) {}
+                return {title: it.title, description: it.description, date: it.date, link: it.link,
+                        source: {name: host || 'По ссылке', link: it.link}};
+            });
+        if (!fresh.length) { notify('Все свежие новости уже добавлены'); return; }
+        state.news = [...fresh, ...state.news].slice(0, 50);
+        renderSection('news');
+        notify(`Добавлено ${fresh.length} новост(ей). Проверьте список и нажмите «Сохранить», чтобы применить.`);
+    } finally {
+        btn.disabled = false;
+    }
 });
 
 (async () => {
-    const res = await fetch('admin-api.php?action=state');
-    const {loggedIn} = await res.json();
-    if (loggedIn) { await loadData(); showPanel(true); }
+    try {
+        const {status, data} = await api('state');
+        if (data.loggedIn) { await loadData(); showPanel(true); }
+    } catch (e) { /* нет PHP-сервера — остаётся форма входа; причину покажет api() при попытке входа */ }
 })();
 </script>
 </body>

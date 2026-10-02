@@ -2,6 +2,8 @@
 // Developer note: load .env early and keep SMTP credentials out of source code.
 
 header('Content-Type: application/json; charset=utf-8');
+// JSON API: предупреждения PHP не должны попадать в ответ и ломать разбор на клиенте
+ini_set('display_errors', '0');
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -19,9 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $name = trim($_POST['name'] ?? '');
 $email = trim($_POST['email'] ?? '');
+$phone = trim($_POST['phone'] ?? '');
 $message = trim($_POST['message'] ?? '');
 
-if ($name === '' || $email === '' || $message === '') {
+if ($name === '' || $email === '' || $phone === '' || $message === '') {
     echo json_encode(['success' => false, 'message' => 'Заполните все поля.']);
     exit;
 }
@@ -46,6 +49,18 @@ $consentEntry = json_encode([
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'message' => 'Некорректный email.']);
+    exit;
+}
+
+// Телефон: только цифры, пробелы, скобки, дефисы и + в начале; 10–15 цифр (E.164)
+if (!preg_match('/^\+?[\d\s\-\(\)]{10,20}$/', $phone) || !($digits = preg_replace('/\D+/', '', $phone)) || strlen($digits) < 10 || strlen($digits) > 15) {
+    echo json_encode(['success' => false, 'message' => 'Укажите корректный номер телефона: от 10 до 15 цифр, например +7 (999) 123-45-67.']);
+    exit;
+}
+
+// Сообщение: тот же лимит, что и maxlength в форме
+if (mb_strlen($message) > 300) {
+    echo json_encode(['success' => false, 'message' => 'Сообщение не должно превышать 300 символов.']);
     exit;
 }
 
@@ -86,7 +101,7 @@ try {
 
     $mail->isHTML(false);
     $mail->Subject = 'Новое сообщение с сайта СантехПро';
-    $mail->Body = "Имя: {$name}\nEmail: {$email}\n\nСообщение:\n{$message}\n";
+    $mail->Body = "Имя: {$name}\nТелефон: {$phone}\nEmail: {$email}\n\nСообщение:\n{$message}\n";
 
     $mail->send();
 

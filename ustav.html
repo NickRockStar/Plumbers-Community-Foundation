@@ -32,5 +32,47 @@
         <p>Изменения в Устав принимаются большинством голосов общего собрания. Действующая редакция вступает в силу с момента принятия.</p>
         <p class="no-print text-center mt-5"><button class="btn btn-primary" onclick="window.print()">Распечатать / Сохранить в PDF</button></p>
     </main>
+
+    <div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Согласие на использование cookie" hidden>
+        <div class="d-flex align-items-start gap-3">
+            <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true" class="flex-shrink-0 mt-1">
+                <circle cx="12" cy="12" r="9.25" fill="#0d6efd"/>
+                <circle cx="9" cy="9" r="1.6" fill="#fff"/>
+                <circle cx="14.5" cy="10.5" r="1.3" fill="#fff"/>
+                <circle cx="10.5" cy="14.5" r="1.4" fill="#fff"/>
+                <circle cx="15" cy="15" r="1.1" fill="#fff"/>
+            </svg>
+            <div>
+                <p class="mb-2">Мы используем минимальные файлы cookie и локальное хранилище браузера: они необходимы для работы сайта и сохранения вашего выбора. Аналитические и рекламные технологии не применяются. Подробнее — в <a href="politika.html">Политике обработки персональных данных</a>.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-primary btn-sm" id="cookieAccept">Принять</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="cookieDecline">Отклонить</button>
+                </div>
+            </div>
+            <button type="button" class="btn-close ms-auto" id="cookieClose" aria-label="Закрыть"></button>
+        </div>
+    </div>
+    <style>
+        .cookie-banner{position:fixed;left:18px;bottom:18px;z-index:1080;max-width:460px;padding:1.25rem;
+            border-radius:1.25rem;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+            box-shadow:0 18px 50px rgba(15,23,42,.22);font-size:.9rem;animation:cookieUp .4s ease}
+        @media (max-width:576px){.cookie-banner{left:12px;right:12px;bottom:12px;max-width:none;padding:1rem}}
+        @media print{.cookie-banner{display:none!important}}
+        @keyframes cookieUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+    </style>
+    <script>
+        (function () {
+            const banner = document.getElementById('cookieBanner');
+            if (!banner || localStorage.getItem('cookieConsent')) return;
+            banner.hidden = false;
+            const save = decision => {
+                localStorage.setItem('cookieConsent', JSON.stringify({ decision, at: new Date().toISOString() }));
+                banner.hidden = true;
+            };
+            document.getElementById('cookieAccept').addEventListener('click', () => save('accepted'));
+            document.getElementById('cookieDecline').addEventListener('click', () => save('declined'));
+            document.getElementById('cookieClose').addEventListener('click', () => { banner.hidden = true; });
+        })();
+    </script>
 </body>
 </html>

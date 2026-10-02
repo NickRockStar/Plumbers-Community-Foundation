@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="i" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0891b2"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#i)"/>
+  <g transform="translate(400,175)">
+    <!-- гаечный ключ -->
+    <g transform="rotate(-38)" fill="#fff" fill-opacity=".92">
+      <rect x="-17" y="-42" width="34" height="152" rx="17"/>
+      <path d="M-36 -52 A36 36 0 1 1 36 -52 L20 -22 H-20 Z"/>
+      <circle cx="0" cy="-56" r="13" fill="url(#i)"/>
+    </g>
+    <!-- отвёртка -->
+    <g transform="rotate(38)" fill="#fff" fill-opacity=".92">
+      <rect x="-21" y="-34" width="42" height="74" rx="18"/>
+      <rect x="-8" y="44" width="16" height="104" rx="8"/>
+      <path d="M-8 148 L0 176 L8 148 Z"/>
+    </g>
+  </g>
+  <rect x="120" y="330" width="560" height="14" rx="7" fill="#fff" opacity=".5"/>
+  <rect x="190" y="370" width="420" height="14" rx="7" fill="#fff" opacity=".3"/>
+  <text x="400" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#fff">Инструменты профессионала</text>
+</svg>

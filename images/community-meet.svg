@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="m" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#m)"/>
+  <g transform="translate(400,180)">
+    <!-- большая реплика -->
+    <g transform="translate(-130,-95)">
+      <rect width="260" height="130" rx="28" fill="#fff" fill-opacity=".95"/>
+      <path d="M30 126 L12 168 L74 126 Z" fill="#fff" fill-opacity=".95"/>
+      <circle cx="70" cy="65" r="13" fill="url(#m)"/>
+      <circle cx="130" cy="65" r="13" fill="url(#m)" opacity=".7"/>
+      <circle cx="190" cy="65" r="13" fill="url(#m)" opacity=".45"/>
+    </g>
+    <!-- ответная реплика -->
+    <g transform="translate(10,45)" fill="#fff" fill-opacity=".55">
+      <rect width="220" height="100" rx="24"/>
+      <path d="M180 96 L200 136 L134 96 Z"/>
+      <rect x="36" y="42" width="148" height="14" rx="7" fill="#fff" opacity=".8"/>
+    </g>
+  </g>
+  <rect x="120" y="330" width="560" height="14" rx="7" fill="#fff" opacity=".5"/>
+  <rect x="190" y="370" width="420" height="14" rx="7" fill="#fff" opacity=".3"/>
+  <text x="400" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#fff">Встречи сообщества</text>
+</svg>

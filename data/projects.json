@@ -1,20 +1,58 @@
 [
     {
-        "title": "Мастер-класс по монтажу",
-        "text": "Ежемесячно обучаем новичков современным методам монтажа и диагностики.",
+        "title": "Тест внешней картинки",
+        "text": "Проверка URL",
+        "image": "https:\/\/www.shutterstock.com\/shutterstock\/photos\/705650296\/display_1500\/stock-vector-sewerage-water-system-flat-design-705650296.jpg",
         "badge": {
-            "text": "Следующий: 20 марта 2026",
-            "type": "primary"
-        },
-        "image": "images/master-class.svg"
+            "text": "123",
+            "type": "info"
+        }
     },
     {
-        "title": "Благотворительный ремонт",
-        "text": "Помогаем малоимущим семьям бесплатно: ремонтируем, настраиваем и заменяем оборудование.",
+        "title": "Тусовка",
+        "text": "Тусили до утра !",
+        "image": "images\/community-meet.svg",
         "badge": {
-            "text": "Добрые дела круглый год",
-            "type": "success"
+            "text": "ТУСА !",
+            "type": "secondary"
+        }
+    },
+    {
+        "title": "Водоснабжение",
+        "text": "Вы добыли воду",
+        "image": "images\/water-supply.svg"
+    },
+    {
+        "title": "Инструменты",
+        "text": "Наши инструменты",
+        "image": "images\/instruments.svg"
+    },
+    {
+        "title": "Команда",
+        "text": "Мы собрались и нажрались !.",
+        "image": "images\/team.svg",
+        "badge": {
+            "text": "БУХАЛОВО",
+            "type": "danger"
+        }
+    },
+    {
+        "title": "Благотворительность",
+        "text": "Мы делаем хорошие дела !",
+        "image": "images\/charity.svg",
+        "badge": {
+            "text": "ДОБРО !.",
+            "type": "primary"
+        }
+    },
+    {
+        "title": "Мастер класс",
+        "text": "Текст о мастере класса",
+        "image": "images\/master-class.svg",
+        "badge": {
+            "text": "МАСТЕР КЛАСС",
+            "type": "warning"
         },
-        "image": "images/charity.svg"
+        "link": "https:\/\/texter.ru\/generate-letters"
     }
 ]

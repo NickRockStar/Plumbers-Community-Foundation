@@ -3,13 +3,19 @@
 // Auth: password from .env (ADMIN_PASSWORD), PHP session. Content stored in data/*.json.
 
 header('Content-Type: application/json; charset=utf-8');
+// JSON API: предупреждения PHP не должны попадать в ответ и ломать разбор на клиенте
+ini_set('display_errors', '0');
 
 require __DIR__ . '/feeds-lib.php';
 
 const DATA_DIR = __DIR__ . '/data';
 const SECTIONS = ['about', 'projects', 'news'];
 const MAX_ITEMS = 50;
-const MAX_TEXT = 2000;
+// Лимиты текста согласованы с maxlength полей в admin.html и гарантируют вёрстку карточек
+const MAX_TEXT = 500;
+const MAX_TITLE = 100;
+const MAX_NEWS_TITLE = 150;
+const MAX_BADGE = 40;
 
 session_start();
 
@@ -36,7 +42,7 @@ function sanitizeItems(string $section, array $items): array {
     foreach (array_slice($items, 0, MAX_ITEMS) as $item) {
         if (!is_array($item)) continue;
         if ($section === 'about') {
-            $entry = ['title' => $str($item['title'] ?? '', 200), 'text' => $str($item['text'] ?? '', MAX_TEXT)];
+            $entry = ['title' => $str($item['title'] ?? '', MAX_TITLE), 'text' => $str($item['text'] ?? '', MAX_TEXT)];
             if (!empty($item['link']['text'])) {
                 $entry['link'] = ['text' => $str($item['link']['text'], 200)];
                 $linkVal = $str($item['link']['modal'] ?? $item['link']['href'] ?? '', 300);
@@ -52,14 +58,14 @@ function sanitizeItems(string $section, array $items): array {
             $clean[] = $entry;
         } elseif ($section === 'projects') {
             $entry = [
-                'title' => $str($item['title'] ?? '', 200),
+                'title' => $str($item['title'] ?? '', MAX_TITLE),
                 'text' => $str($item['text'] ?? '', MAX_TEXT),
                 'image' => $str($item['image'] ?? '', 500),
             ];
             if (!empty($item['badge']['text'])) {
                 $types = ['primary', 'success', 'warning', 'danger', 'info', 'secondary'];
                 $type = in_array($item['badge']['type'] ?? '', $types, true) ? $item['badge']['type'] : 'primary';
-                $entry['badge'] = ['text' => $str($item['badge']['text'], 200), 'type' => $type];
+                $entry['badge'] = ['text' => $str($item['badge']['text'], MAX_BADGE), 'type' => $type];
             }
             if (!empty($item['link'])) {
                 $entry['link'] = filter_var($str($item['link'], 500), FILTER_VALIDATE_URL) ?: '';
@@ -69,7 +75,7 @@ function sanitizeItems(string $section, array $items): array {
         } else { // news
             $link = $str($item['link'] ?? '', 500);
             $entry = [
-                'title' => $str($item['title'] ?? '', 300),
+                'title' => $str($item['title'] ?? '', MAX_NEWS_TITLE),
                 'description' => $str($item['description'] ?? '', MAX_TEXT),
                 'date' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $str($item['date'] ?? '', 10)) ? $str($item['date'], 10) : date('Y-m-d'),
                 'link' => filter_var($link, FILTER_VALIDATE_URL) ?: '',
@@ -162,8 +168,12 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'rss') {
-    $items = rssItems(6);
-    jsonOut(['success' => true, 'items' => $items]);
+    try {
+        $items = rssItems(6);
+        jsonOut(['success' => true, 'items' => $items]);
+    } catch (Throwable $e) {
+        jsonOut(['success' => false, 'message' => 'Не удалось получить ленты: ' . $e->getMessage()]);
+    }
 }
 
 jsonOut(['success' => false, 'message' => 'Неизвестное действие.'], 400);

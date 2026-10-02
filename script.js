@@ -69,22 +69,35 @@ function renderInto(containerId, html) {
     });
 }
 
+function placeholderBlock(icon, title, text) {
+    // Developer note: shown when a section has no content (empty data file or load failure)
+    return `<div class="col-12 reveal">
+        <div class="glass-card text-center p-5">
+            <div class="icon-bubble"><i class="fas ${icon} fa-2x"></i></div>
+            <h4 class="mb-2">${title}</h4>
+            <p class="text-muted mb-0">${text}</p>
+        </div>
+    </div>`;
+}
+
 async function loadAbout() {
     try {
         const items = await loadJson('data/about.json');
-        if (!Array.isArray(items) || items.length === 0) return;
+        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
         renderInto('aboutContainer', items.map(item => `
             <div class="col-lg-4 reveal"><div class="glass-card h-100 p-4"><h4>${escapeHtml(item.title)}</h4><p class="mb-0">${escapeHtml(item.text)}${item.link ? (item.link.modal
                 ? ` <a href="#" data-bs-toggle="modal" data-bs-target="${escapeHtml(item.link.modal)}">${escapeHtml(item.link.text)}</a>`
                 : ` <a href="${encodeURI(item.link.href || '#')}">${escapeHtml(item.link.text)}</a>`) : ''}</p></div></div>
         `).join(''));
-    } catch (e) { /* keep empty section */ }
+    } catch (e) {
+        renderInto('aboutContainer', placeholderBlock('fa-users', 'Информация скоро появится', 'Мы готовим рассказ о сообществе и его участниках — загляните чуть позже.'));
+    }
 }
 
 async function loadProjects() {
     try {
         const items = await loadJson('data/projects.json');
-        if (!Array.isArray(items) || items.length === 0) return;
+        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
         renderInto('projectsContainer', items.map(item => `
             <div class="col-md-6 reveal">
                 <div class="card project-card h-100">
@@ -98,7 +111,54 @@ async function loadProjects() {
                 </div>
             </div>
         `).join(''));
-    } catch (e) { /* keep empty section */ }
+    } catch (e) {
+        renderInto('projectsContainer', placeholderBlock('fa-diagram-project', 'Проекты скоро появятся', 'Мы готовим анонсы мероприятий и добрых дел — загляните чуть позже.'));
+    }
+}
+
+// Developer note: news render 6 per page; extra items go to pagination (#newsPagination)
+const NEWS_PER_PAGE = 6;
+let newsItems = [];
+let newsPage = 1;
+
+function renderNewsPage() {
+    const container = document.getElementById('newsContainer');
+    const pag = document.getElementById('newsPagination');
+    if (!container || !pag) return;
+    const pages = Math.ceil(newsItems.length / NEWS_PER_PAGE);
+    const start = (newsPage - 1) * NEWS_PER_PAGE;
+
+    renderInto('newsContainer', newsItems.slice(start, start + NEWS_PER_PAGE).map(item => `
+        <div class="col-md-6 col-lg-4 reveal">
+            <div class="card news-card h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="card-title">${escapeHtml(item.title)}</h5>
+                    ${item.description ? `<p class="card-text">${escapeHtml(item.description)}</p>` : ''}
+                    ${item.source && item.source.name ? `<small class="text-muted d-block mb-2">Источник: ${item.source.link
+                        ? `<a href="${encodeURI(item.source.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.source.name)}</a>`
+                        : escapeHtml(item.source.name)}</small>` : ''}
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <small class="text-muted">${formatDate(item.date)}</small>
+                        ${item.link ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">Читать</a>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join(''));
+
+    if (pages <= 1) {
+        pag.classList.add('d-none');
+        pag.innerHTML = '';
+        return;
+    }
+    pag.classList.remove('d-none');
+    pag.innerHTML = `
+        <ul class="pagination justify-content-center mb-0">
+            <li class="page-item ${newsPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#news" data-page="${newsPage - 1}" aria-label="Предыдущая страница">&laquo;</a></li>
+            ${Array.from({ length: pages }, (_, i) => `
+                <li class="page-item ${i + 1 === newsPage ? 'active' : ''}"><a class="page-link" href="#news" data-page="${i + 1}">${i + 1}</a></li>`).join('')}
+            <li class="page-item ${newsPage === pages ? 'disabled' : ''}"><a class="page-link" href="#news" data-page="${newsPage + 1}" aria-label="Следующая страница">&raquo;</a></li>
+        </ul>`;
 }
 
 async function loadNews() {
@@ -107,30 +167,24 @@ async function loadNews() {
     if (!container) return;
 
     try {
-        const items = await loadJson('data/news.json');
-        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
+        newsItems = await loadJson('data/news.json');
+        if (!Array.isArray(newsItems) || newsItems.length === 0) throw new Error('empty');
 
         loader?.remove();
-        renderInto('newsContainer', items.map(item => `
-            <div class="col-md-6 col-lg-4 reveal">
-                <div class="card news-card h-100">
-                    <div class="card-body p-4 d-flex flex-column">
-                        <h5 class="card-title">${escapeHtml(item.title)}</h5>
-                        ${item.description ? `<p class="card-text">${escapeHtml(item.description)}</p>` : ''}
-                        ${item.source && item.source.name ? `<small class="text-muted d-block mb-2">Источник: ${item.source.link
-                            ? `<a href="${encodeURI(item.source.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.source.name)}</a>`
-                            : escapeHtml(item.source.name)}</small>` : ''}
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <small class="text-muted">${formatDate(item.date)}</small>
-                            ${item.link ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">Читать</a>` : ''}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `).join(''));
+        renderNewsPage();
+        document.getElementById('newsPagination')?.addEventListener('click', e => {
+            const link = e.target.closest('a[data-page]');
+            if (!link) return;
+            e.preventDefault();
+            const page = +link.dataset.page;
+            if (page < 1 || page > Math.ceil(newsItems.length / NEWS_PER_PAGE) || page === newsPage) return;
+            newsPage = page;
+            renderNewsPage();
+            document.getElementById('news')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
     } catch (error) {
         loader?.remove();
-        container.innerHTML = '<div class="col-12"><div class="alert alert-warning text-center mb-0">Не удалось загрузить новости. Обновите страницу позже.</div></div>';
+        renderInto('newsContainer', placeholderBlock('fa-newspaper', 'Новостей пока нет', 'Здесь появятся новости сообщества и отраслевые события — загляните позже.'));
     }
 }
 
@@ -192,8 +246,55 @@ document.getElementById('cookieAccept')?.addEventListener('click', () => saveCoo
 document.getElementById('cookieDecline')?.addEventListener('click', () => saveCookieChoice('declined'));
 document.getElementById('cookieClose')?.addEventListener('click', () => { cookieBanner.hidden = true; });
 
+// Телефон: маска +7 (XXX) XXX-XX-XX — форматирование на лету, цифры до 11 штук
+function formatPhone(raw) {
+    let d = raw.replace(/\D/g, '');
+    if (!d) return '';
+    if (d[0] === '8') d = '7' + d.slice(1); // 8 -> +7
+    if (d[0] === '9') d = '7' + d;          // ввели без кода страны
+    d = d.slice(0, 11);
+    const rest = d.slice(1);
+    let out = '+' + d[0];
+    if (rest.length > 0) out += ' (' + rest.slice(0, 3);
+    if (rest.length >= 3) out += ')';
+    if (rest.length > 3) out += ' ' + rest.slice(3, 6);
+    if (rest.length > 6) out += '-' + rest.slice(6, 8);
+    if (rest.length > 8) out += '-' + rest.slice(8, 10);
+    return out;
+}
+
+const phoneInput = document.querySelector('#contactForm input[name="phone"]');
+phoneInput?.addEventListener('input', function () {
+    this.value = formatPhone(this.value);
+    this.setCustomValidity('');
+    const digits = this.value.replace(/\D/g, '');
+    if (this.value !== '' && (digits.length < 10 || digits.length > 15)) {
+        this.setCustomValidity('Телефон должен содержать от 10 до 15 цифр');
+    }
+});
+
+// Сообщение: счётчик символов (лимит задан maxlength в разметке и проверкой на сервере)
+const MESSAGE_MAX = 300;
+const messageInput = document.querySelector('#contactForm textarea[name="message"]');
+const messageCounter = document.getElementById('messageCounter');
+function updateMessageCounter() {
+    if (!messageInput || !messageCounter) return;
+    const len = messageInput.value.length;
+    messageCounter.textContent = `${len}/${MESSAGE_MAX}`;
+    // text-muted в Bootstrap объявлен позже text-danger — держим только один из классов
+    messageCounter.classList.toggle('text-danger', len >= MESSAGE_MAX);
+    messageCounter.classList.toggle('text-muted', len < MESSAGE_MAX);
+}
+messageInput?.addEventListener('input', updateMessageCounter);
+
 document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    // novalidate: вместо браузерных бабблов поля подсвечивает Bootstrap (was-validated)
+    if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+    }
 
     const formData = new FormData(this);
 
@@ -208,6 +309,8 @@ document.getElementById('contactForm').addEventListener('submit', async function
         toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-primary');
         if (result.success) {
             this.reset();
+            this.classList.remove('was-validated');
+            updateMessageCounter();
             toastEl.classList.add('text-bg-success');
             toastText.textContent = 'Сообщение отправлено на почту.';
         } else {
