@@ -285,6 +285,36 @@ async function loadData() {
     }
 }
 
+// Проверка заполнения карточек перед сохранением: подсвечивает поля и возвращает список ошибок
+function validateSection(section) {
+    const errors = [];
+    document.querySelectorAll(`#list-${section} .item-card`).forEach(card => {
+        const num = +card.dataset.i + 1;
+        const get = (k) => card.querySelector(`[data-k="${k}"]`);
+        const bad = (el, msg) => { if (el) { el.classList.add('is-invalid'); errors.push(`№${num}: ${msg}`); } };
+        const isUrl = (v) => /^https?:\/\//i.test(v);
+        const title = get('title');
+        if (title && !title.value.trim()) bad(title, 'пустой заголовок — карточка не сохранится');
+        if (section === 'news') {
+            const date = get('date');
+            if (date && date.value && !/^\d{4}-\d{2}-\d{2}$/.test(date.value)) bad(date, 'дата должна быть в формате ГГГГ-ММ-ДД');
+            const link = get('link');
+            if (link && link.value.trim() && !isUrl(link.value.trim())) bad(link, 'ссылка «Читать» должна начинаться с http:// или https://');
+            const srcLink = get('source.link');
+            if (srcLink && srcLink.value.trim() && !isUrl(srcLink.value.trim())) bad(srcLink, 'ссылка на источник должна начинаться с http:// или https://');
+        }
+        if (section === 'projects') {
+            const link = get('link');
+            if (link && link.value.trim() && !isUrl(link.value.trim())) bad(link, 'ссылка «Подробнее» должна начинаться с http:// или https://');
+        }
+        if (section === 'about') {
+            const lv = get('linkValue');
+            if (lv && lv.value.trim() && !/^(#|https?:\/\/)/i.test(lv.value.trim())) bad(lv, 'ссылка должна начинаться с http://, https:// или с # (для устава)');
+        }
+    });
+    return errors;
+}
+
 document.addEventListener('click', async e => {
     const addBtn = e.target.closest('[data-add]');
     if (addBtn) {
@@ -322,10 +352,19 @@ document.addEventListener('click', async e => {
     if (saveBtn) {
         const s = saveBtn.dataset.save;
         collect(s);
+        const errors = validateSection(s);
+        if (errors.length) {
+            notify('Исправьте ошибки: ' + errors.slice(0, 2).join('; ') + (errors.length > 2 ? `… и ещё ${errors.length - 2}` : ''), false);
+            return;
+        }
         saveBtn.disabled = true;
         const {status, data} = await api('save', {section: s, items: JSON.stringify(state[s])});
         saveBtn.disabled = false;
-        if (data.success) { notify(`Сохранено: ${data.saved} блок(ов). На сайте изменения уже видны.`); renderSection(s); }
+        if (data.success) {
+            if (data.saved < state[s].length) notify(`Сохранено ${data.saved} из ${state[s].length}. Часть блоков отфильтрована — проверьте заголовки.`, false);
+            else notify(`Сохранено: ${data.saved} блок(ов). На сайте изменения уже видны.`);
+            renderSection(s);
+        }
         else notify(data.message || 'Ошибка сохранения', false);
     }
 });
@@ -370,10 +409,12 @@ document.addEventListener('input', e => {
     imagePreviewTimer = setTimeout(() => refreshImagePreview(input.closest('.mb-2')), 400);
 });
 
-// Живые счётчики символов для полей с лимитом (input.maxLength === -1, если maxlength не задан)
+// Живые счётчики символов для полей с лимитом; заодно снимаем подсветку ошибки при исправлении
 document.addEventListener('input', e => {
     const input = e.target.closest('[data-k]');
-    if (!input || input.maxLength < 0) return;
+    if (!input) return;
+    input.classList.remove('is-invalid');
+    if (input.maxLength < 0) return;
     const counter = input.closest('.mb-2')?.querySelector('[data-char-count]');
     if (counter) counter.textContent = `${input.value.length}/${input.maxLength}`;
 });
