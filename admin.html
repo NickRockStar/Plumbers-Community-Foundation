@@ -93,6 +93,21 @@
     </div>
 </div>
 
+<!-- Уведомление об использовании cookie и локального хранилища -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Согласие на использование cookie" hidden>
+    <div class="d-flex align-items-start gap-3">
+        <i class="fas fa-cookie-bite fa-2x text-primary mt-1"></i>
+        <div>
+            <p class="mb-2">Админ-панель использует технически необходимые cookie (PHP-сессия для входа) и локальное хранилище браузера. Аналитика и реклама не применяются. Подробнее — в <a href="politika.html">Политике обработки персональных данных</a>.</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary btn-sm" id="cookieAccept">Принять</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="cookieDecline">Отклонить</button>
+            </div>
+        </div>
+        <button type="button" class="btn-close ms-auto" id="cookieClose" aria-label="Закрыть"></button>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // max — лимит символов: совпадает с truncate-лимитами в admin-api.php и показывает счётчик в форме
@@ -450,6 +465,19 @@ document.getElementById('importRssBtn').addEventListener('click', async () => {
         if (data.loggedIn) { await loadData(); showPanel(true); }
     } catch (e) { /* нет PHP-сервера — остаётся форма входа; причину покажет api() при попытке входа */ }
 })();
+
+// Cookie-уведомление (решение хранится в localStorage, без трекингов)
+const cookieBanner = document.getElementById('cookieBanner');
+if (cookieBanner && !localStorage.getItem('cookieConsent')) {
+    cookieBanner.hidden = false;
+}
+const saveCookieChoice = decision => {
+    localStorage.setItem('cookieConsent', JSON.stringify({ decision, at: new Date().toISOString() }));
+    cookieBanner.hidden = true;
+};
+document.getElementById('cookieAccept')?.addEventListener('click', () => saveCookieChoice('accepted'));
+document.getElementById('cookieDecline')?.addEventListener('click', () => saveCookieChoice('declined'));
+document.getElementById('cookieClose')?.addEventListener('click', () => { cookieBanner.hidden = true; });
 </script>
 </body>
 </html>
