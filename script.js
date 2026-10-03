@@ -35,10 +35,29 @@ const counterObserver = new IntersectionObserver(entries => {
         }
     });
 }, { threshold: 0.4 });
-document.querySelectorAll('.stat-num[data-count]').forEach(el => {
-    el.textContent = '0' + (el.dataset.suffix || '');
-    counterObserver.observe(el);
-});
+// Статистика «О нас»: анимированные счётчики из data/stats.json
+async function loadStats() {
+    const container = document.getElementById('statsContainer');
+    const loader = document.getElementById('statsLoader');
+    if (!container) return;
+    try {
+        const items = await loadJson('data/stats.json');
+        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
+
+        loader?.remove();
+        renderInto('statsContainer', items.map(item => {
+            const suffix = escapeHtml(item.suffix || '');
+            const value = parseInt(item.value, 10) || 0;
+            return `
+            <div class="col-6 col-lg-3 reveal"><div class="glass-card stat-card h-100 p-4 text-center"><div class="stat-num" data-count="${value}" data-suffix="${suffix}">0${suffix}</div><div class="text-muted">${escapeHtml(item.label || '')}</div></div></div>`;
+        }).join(''));
+        container.querySelectorAll('.stat-num[data-count]').forEach(el => counterObserver.observe(el));
+    } catch (error) {
+        loader?.remove();
+        renderInto('statsContainer', placeholderBlock('fa-chart-simple', 'Статистика скоро появится', 'Цифры сообщества будут опубликованы здесь.'));
+    }
+}
+loadStats();
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

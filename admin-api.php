@@ -9,7 +9,7 @@ ini_set('display_errors', '0');
 require __DIR__ . '/feeds-lib.php';
 
 const DATA_DIR = __DIR__ . '/data';
-const SECTIONS = ['about', 'mission', 'values', 'directions', 'projects', 'news', 'docs'];
+const SECTIONS = ['about', 'mission', 'values', 'stats', 'directions', 'projects', 'news', 'docs'];
 const MAX_ITEMS = 50;
 // Лимиты текста согласованы с maxlength полей в admin.html и гарантируют вёрстку карточек
 const MAX_TEXT = 500;
@@ -82,6 +82,17 @@ function sanitizeItems(string $section, array $items): array {
                 'icon' => in_array($icon, $icons, true) ? $icon : 'fa-heart',
             ];
             if ($entry['title'] === '') continue;
+            $clean[] = $entry;
+        } elseif ($section === 'stats') {
+            // Статистика «О нас»: число (0-999999), суффикс из белого списка и подпись
+            $value = max(0, min(999999, (int)($item['value'] ?? 0)));
+            $suffix = in_array($item['suffix'] ?? '', ['', '+', '%'], true) ? $item['suffix'] : '';
+            $entry = [
+                'value' => $value,
+                'suffix' => $suffix,
+                'label' => $str($item['label'] ?? '', 100),
+            ];
+            if ($entry['label'] === '') continue;
             $clean[] = $entry;
         } elseif ($section === 'mission') {
             // Миссия: одна цитата, кавычки-«ёлочки» добавляются на сайте

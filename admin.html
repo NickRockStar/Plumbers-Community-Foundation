@@ -44,6 +44,7 @@
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-about" type="button">О нас</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-mission" type="button">Миссия</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-values" type="button">Ценности</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-stats" type="button">Статистика</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-projects" type="button">Проекты и мероприятия</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-directions" type="button">Направления</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-news" type="button">Новости</button></li>
@@ -82,6 +83,18 @@
                 </div>
             </div>
             <div id="list-values"></div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="tab-pane fade" id="tab-stats">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <span class="text-muted small">Счётчики в блоке «О нас». Вводите только число — суффикс (+ или %) выбирается отдельно.</span>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" data-add="stats"><i class="fas fa-plus me-1"></i>Добавить</button>
+                    <button class="btn btn-success btn-sm" data-save="stats"><i class="fas fa-save me-1"></i>Сохранить «Статистику»</button>
+                </div>
+            </div>
+            <div id="list-stats"></div>
         </div>
 
         <!-- Проекты -->
@@ -189,6 +202,11 @@ const FIELDS = {
     mission: [
         {key: 'quote', label: 'Миссия — цитата (кавычки добавятся на сайте)', type: 'textarea', max: 300}
     ],
+    stats: [
+        {key: 'value', label: 'Число (только цифры)', max: 6},
+        {key: 'suffix', label: 'Суффикс', type: 'select', options: [['', 'Без суффикса'], ['+', 'Плюс +'], ['%', 'Процент %']]},
+        {key: 'label', label: 'Подпись (напр. мастеров в сообществе)', max: 100}
+    ],
     values: [
         {key: 'title', label: 'Название ценности', max: 60},
         {key: 'text', label: 'Описание', type: 'textarea', max: 200},
@@ -228,7 +246,7 @@ const FIELDS = {
         ]}
     ]
 };
-const state = {about: [], mission: [], values: [], directions: [], projects: [], news: [], docs: []};
+const state = {about: [], mission: [], values: [], stats: [], directions: [], projects: [], news: [], docs: []};
 const toastEl = document.getElementById('adminToast');
 const toastText = document.getElementById('adminToastText');
 const toast = bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 2500});
@@ -307,7 +325,7 @@ function renderSection(section) {
         : '<div class="alert alert-light text-muted mb-0">Пока нет ни одного блока — нажмите «Добавить».</div>';
 }
 
-function renderAll() { ['about', 'mission', 'values', 'directions', 'projects', 'news', 'docs'].forEach(renderSection); }
+function renderAll() { ['about', 'mission', 'values', 'stats', 'directions', 'projects', 'news', 'docs'].forEach(renderSection); }
 
 // Collect form values back into state before save
 function collect(section) {
@@ -376,6 +394,7 @@ async function loadData() {
             state.docs = data.docs || [];
             state.mission = data.mission || [];
             state.values = data.values || [];
+            state.stats = data.stats || [];
             state.directions = data.directions || [];
             renderAll();
         } else {
@@ -408,6 +427,12 @@ function validateSection(section) {
             const link = get('link');
             if (link && link.value.trim() && !isUrl(link.value.trim())) bad(link, 'ссылка «Подробнее» должна начинаться с http:// или https://');
         }
+        if (section === 'stats') {
+            const value = get('value');
+            if (value && value.value.trim() && !/^\d{1,6}$/.test(value.value.trim())) bad(value, 'число должно быть от 0 до 999999');
+            const label = get('label');
+            if (label && !label.value.trim()) bad(label, 'пустая подпись — счётчик не сохранится');
+        }
         if (section === 'mission') {
             const quote = get('quote');
             if (quote && !quote.value.trim()) bad(quote, 'пустая цитата миссии');
@@ -433,6 +458,7 @@ document.addEventListener('click', async e => {
                      : s === 'docs' ? {title: '', text: '', tag: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning'}
                      : s === 'mission' ? {quote: ''}
                      : s === 'values' ? {title: '', text: '', icon: 'fa-heart'}
+                     : s === 'stats' ? {value: '0', suffix: '', label: ''}
                      : s === 'directions' ? {title: '', text: ''}
                      : {title: '', text: ''};
         state[s].unshift(blank);
