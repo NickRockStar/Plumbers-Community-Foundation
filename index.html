@@ -58,7 +58,7 @@
             <p class="section-subtitle text-center reveal">Сообщество помогает мастерам учиться, обмениваться практикой и участвовать в благотворительных проектах.</p>
             <div class="row justify-content-center mb-4 reveal">
                 <div class="col-lg-9 text-center">
-                    <p class="lead mb-0">«Каждый мастер должен иметь возможность учиться, помогать людям и развивать отрасль вместе с коллегами».</p>
+                    <p class="lead mb-0" id="missionQuote">«Каждый мастер должен иметь возможность учиться, помогать людям и развивать отрасль вместе с коллегами».</p>
                 </div>
             </div>
             <div class="row g-3 mb-5">
@@ -85,13 +85,8 @@
         <div class="container">
             <h2 class="text-center section-title reveal">Наши направления</h2>
             <p class="section-subtitle text-center reveal">Чем живёт сообщество — от обучения новичков до благотворительных выездов.</p>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4 reveal"><div class="glass-card direction-card h-100 p-4"><div class="direction-num">01</div><h5>Обучение и мастер-классы</h5><p class="text-muted small mb-0">Регулярные практические занятия: от простых замен до сложных инженерных систем.</p></div></div>
-                <div class="col-md-6 col-lg-4 reveal"><div class="glass-card direction-card h-100 p-4"><div class="direction-num">02</div><h5>Благотворительные ремонты</h5><p class="text-muted small mb-0">Помогаем семьям, пенсионерам и людям с ограниченными возможностями.</p></div></div>
-                <div class="col-md-6 col-lg-4 reveal"><div class="glass-card direction-card h-100 p-4"><div class="direction-num">03</div><h5>Взаимопомощь и менторство</h5><p class="text-muted small mb-0">Совет опытного коллеги — в любое время и в любой ситуации на объекте.</p></div></div>
-                <div class="col-md-6 col-lg-4 reveal"><div class="glass-card direction-card h-100 p-4"><div class="direction-num">04</div><h5>Мероприятия и семинары</h5><p class="text-muted small mb-0">Встречи сообщества, разбор реальных кейсов и обмен опытом.</p></div></div>
-                <div class="col-md-6 col-lg-4 reveal"><div class="glass-card direction-card h-100 p-4"><div class="direction-num">05</div><h5>Стандарты и качество</h5><p class="text-muted small mb-0">Продвигаем честные профессиональные стандарты в отрасли.</p></div></div>
-                <div class="col-md-6 col-lg-4 reveal"><div class="glass-card direction-card h-100 p-4"><div class="direction-num">06</div><h5>Оборудование и материалы</h5><p class="text-muted small mb-0">Делимся проверенными поставщиками и помогаем с выбором инструмента.</p></div></div>
+            <div class="row g-4" id="directionsContainer">
+                <div class="col-12 text-center py-5" id="directionsLoader"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div><p class="text-muted mt-3 mb-0">Загружаем направления...</p></div>
             </div>
         </div>
     </section>

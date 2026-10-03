@@ -288,7 +288,45 @@ async function loadDocs() {
     }
 }
 
+// Миссия: цитата подменяется из data/mission.json; без данных остаётся текст из разметки
+async function loadMission() {
+    const el = document.getElementById('missionQuote');
+    if (!el) return;
+    try {
+        const items = await loadJson('data/mission.json');
+        const quote = Array.isArray(items) && items[0] && items[0].quote;
+        if (quote) el.textContent = '«' + quote + '»';
+    } catch (error) { /* нет данных — остаётся разметка */ }
+}
+
+// Направления: номер карточки генерируется по порядку (01, 02, …)
+async function loadDirections() {
+    const container = document.getElementById('directionsContainer');
+    const loader = document.getElementById('directionsLoader');
+    if (!container) return;
+    try {
+        const items = await loadJson('data/directions.json');
+        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
+
+        loader?.remove();
+        renderInto('directionsContainer', items.map((item, i) => `
+            <div class="col-md-6 col-lg-4 reveal">
+                <div class="glass-card direction-card h-100 p-4">
+                    <div class="direction-num">${String(i + 1).padStart(2, '0')}</div>
+                    <h5>${escapeHtml(item.title)}</h5>
+                    <p class="text-muted small mb-0">${escapeHtml(item.text || '')}</p>
+                </div>
+            </div>
+        `).join(''));
+    } catch (error) {
+        loader?.remove();
+        renderInto('directionsContainer', placeholderBlock('fa-compass', 'Направления скоро появятся', 'Мы готовим описание направлений работы сообщества.'));
+    }
+}
+
 loadAbout();
+loadMission();
+loadDirections();
 loadProjects();
 loadNews();
 loadDocs();

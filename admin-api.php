@@ -9,7 +9,7 @@ ini_set('display_errors', '0');
 require __DIR__ . '/feeds-lib.php';
 
 const DATA_DIR = __DIR__ . '/data';
-const SECTIONS = ['about', 'projects', 'news', 'docs'];
+const SECTIONS = ['about', 'mission', 'directions', 'projects', 'news', 'docs'];
 const MAX_ITEMS = 50;
 // Лимиты текста согласованы с maxlength полей в admin.html и гарантируют вёрстку карточек
 const MAX_TEXT = 500;
@@ -70,6 +70,19 @@ function sanitizeItems(string $section, array $items): array {
             if (!empty($item['link'])) {
                 $entry['link'] = filter_var($str($item['link'], 500), FILTER_VALIDATE_URL) ?: '';
             }
+            if ($entry['title'] === '') continue;
+            $clean[] = $entry;
+        } elseif ($section === 'mission') {
+            // Миссия: одна цитата, кавычки-«ёлочки» добавляются на сайте
+            $quote = $str($item['quote'] ?? '', 300);
+            if ($quote === '') continue;
+            $clean[] = ['quote' => $quote];
+        } elseif ($section === 'directions') {
+            // Направления: номер карточки генерируется по порядку на сайте
+            $entry = [
+                'title' => $str($item['title'] ?? '', MAX_TITLE),
+                'text' => $str($item['text'] ?? '', MAX_TEXT),
+            ];
             if ($entry['title'] === '') continue;
             $clean[] = $entry;
         } elseif ($section === 'docs') {

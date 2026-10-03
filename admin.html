@@ -42,7 +42,9 @@
 <div class="admin-wrap" id="panelView" hidden>
     <ul class="nav nav-pills mb-4 justify-content-center" id="tabs" role="tablist">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-about" type="button">О нас</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-mission" type="button">Миссия</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-projects" type="button">Проекты и мероприятия</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-directions" type="button">Направления</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-news" type="button">Новости</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-docs" type="button">Документы</button></li>
     </ul>
@@ -58,6 +60,15 @@
                 </div>
             </div>
             <div id="list-about"></div>
+        </div>
+
+        <!-- Миссия -->
+        <div class="tab-pane fade" id="tab-mission">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <span class="text-muted small">Цитата-миссия на главной. Кавычки-«ёлочки» добавятся автоматически.</span>
+                <button class="btn btn-success btn-sm" data-save="mission"><i class="fas fa-save me-1"></i>Сохранить миссию</button>
+            </div>
+            <div id="list-mission"></div>
         </div>
 
         <!-- Проекты -->
@@ -83,6 +94,18 @@
                 </div>
             </div>
             <div id="list-news"></div>
+        </div>
+
+        <!-- Направления -->
+        <div class="tab-pane fade" id="tab-directions">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <span class="text-muted small">Карточки «Наши направления». Номера (01, 02…) присваиваются по порядку автоматически.</span>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" data-add="directions"><i class="fas fa-plus me-1"></i>Добавить</button>
+                    <button class="btn btn-success btn-sm" data-save="directions"><i class="fas fa-save me-1"></i>Сохранить «Направления»</button>
+                </div>
+            </div>
+            <div id="list-directions"></div>
         </div>
 
         <!-- Документы -->
@@ -150,6 +173,13 @@ const FIELDS = {
         ]},
         {key: 'link', label: 'Ссылка «Подробнее» https://… (необязательно)'}
     ],
+    mission: [
+        {key: 'quote', label: 'Миссия — цитата (кавычки добавятся на сайте)', type: 'textarea', max: 300}
+    ],
+    directions: [
+        {key: 'title', label: 'Заголовок', max: 100},
+        {key: 'text', label: 'Описание', type: 'textarea', max: 500}
+    ],
     news: [
         {key: 'title', label: 'Заголовок', max: 150},
         {key: 'description', label: 'Описание', type: 'textarea', max: 500},
@@ -175,7 +205,7 @@ const FIELDS = {
         ]}
     ]
 };
-const state = {about: [], projects: [], news: [], docs: []};
+const state = {about: [], mission: [], directions: [], projects: [], news: [], docs: []};
 const toastEl = document.getElementById('adminToast');
 const toastText = document.getElementById('adminToastText');
 const toast = bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 2500});
@@ -254,7 +284,7 @@ function renderSection(section) {
         : '<div class="alert alert-light text-muted mb-0">Пока нет ни одного блока — нажмите «Добавить».</div>';
 }
 
-function renderAll() { ['about', 'projects', 'news', 'docs'].forEach(renderSection); }
+function renderAll() { ['about', 'mission', 'directions', 'projects', 'news', 'docs'].forEach(renderSection); }
 
 // Collect form values back into state before save
 function collect(section) {
@@ -321,6 +351,8 @@ async function loadData() {
             state.projects = data.projects || [];
             state.news = data.news || [];
             state.docs = data.docs || [];
+            state.mission = data.mission || [];
+            state.directions = data.directions || [];
             renderAll();
         } else {
             notify(message || 'Не удалось загрузить данные. Обновите страницу.', false);
@@ -352,6 +384,10 @@ function validateSection(section) {
             const link = get('link');
             if (link && link.value.trim() && !isUrl(link.value.trim())) bad(link, 'ссылка «Подробнее» должна начинаться с http:// или https://');
         }
+        if (section === 'mission') {
+            const quote = get('quote');
+            if (quote && !quote.value.trim()) bad(quote, 'пустая цитата миссии');
+        }
         if (section === 'docs') {
             const link = get('link');
             if (link && link.value.trim() && (/\s/.test(link.value.trim()) || /^javascript:/i.test(link.value.trim()))) bad(link, 'ссылка без пробелов: ustav.html или https://…');
@@ -371,6 +407,8 @@ document.addEventListener('click', async e => {
         const blank = s === 'news' ? {title: '', description: '', date: new Date().toISOString().slice(0, 10), link: '', source: {name: '', link: ''}}
                      : s === 'projects' ? {title: '', text: '', image: 'images/master-class.svg'}
                      : s === 'docs' ? {title: '', text: '', tag: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning'}
+                     : s === 'mission' ? {quote: ''}
+                     : s === 'directions' ? {title: '', text: ''}
                      : {title: '', text: ''};
         state[s].unshift(blank);
         renderSection(s);
