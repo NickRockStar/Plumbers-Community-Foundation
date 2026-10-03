@@ -366,6 +366,14 @@ footer{background:#0b1220; color:#e2e8f0; padding:40px 0}
 .stat-card{transition:transform .35s ease, box-shadow .35s ease}
 .stat-num{font-size:2.4rem;font-weight:800;letter-spacing:-.03em;line-height:1.1;background:linear-gradient(135deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
 @media (max-width:360px){.stat-num{font-size:1.9rem}}
+/* Меню на узких десктопах (992-1199): 9 пунктов без переноса слов */
+@media (min-width: 992px) and (max-width: 1199.98px){
+    .navbar .nav-link{padding-left:.35rem;padding-right:.35rem;font-size:.875rem;white-space:nowrap}
+    .navbar-brand{font-size:1.05rem}
+}
+/* Мягкие переносы для длинных русских слов в карточках */
+.glass-card p, .glass-card h6, .stat-card .text-muted{hyphens:auto}
+.don-sum{white-space:nowrap}
 /* Открытые данные фонда: тег-чип и статусная строка поверх фирменной glass-карточки */
 .doc-tag{padding:.32rem .75rem;border-radius:999px;background:rgba(13,110,253,.1);color:var(--primary);font-size:.72rem;font-weight:700;letter-spacing:.02em;white-space:nowrap;flex-shrink:0}
 .doc-st{--st-color:#16a34a;--st-glow:rgba(34,197,94,.5);display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;color:var(--st-color)}
