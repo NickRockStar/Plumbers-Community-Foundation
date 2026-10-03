@@ -217,28 +217,67 @@ async function loadNews() {
     }
 }
 
+// Документы: 8 на страницу (два ряда по 4), лишнее — в пагинацию
+const DOCS_PER_PAGE = 8;
+let docsItems = [];
+let docsPage = 1;
+
+function renderDocsPage() {
+    const container = document.getElementById('docsContainer');
+    const pag = document.getElementById('docsPagination');
+    if (!container || !pag) return;
+    const pages = Math.ceil(docsItems.length / DOCS_PER_PAGE);
+    const start = (docsPage - 1) * DOCS_PER_PAGE;
+
+    renderInto('docsContainer', docsItems.slice(start, start + DOCS_PER_PAGE).map(item => `
+        <div class="col-md-6 col-lg-3 reveal">
+            <div class="glass-card h-100 p-4 text-center">
+                <div class="icon-bubble"><i class="fas ${escapeHtml(item.icon || 'fa-file-lines')} fa-2x"></i></div>
+                <h5>${escapeHtml(item.title)}</h5>
+                <p class="text-muted small">${escapeHtml(item.text || '')}</p>
+                ${item.link
+                    ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">${escapeHtml(item.linkText || 'Открыть')}</a>`
+                    : (item.badge ? `<span class="badge text-bg-${escapeHtml(item.badgeColor || 'warning')}">${escapeHtml(item.badge)}</span>` : '')}
+            </div>
+        </div>
+    `).join(''));
+
+    if (pages <= 1) {
+        pag.classList.add('d-none');
+        pag.innerHTML = '';
+        return;
+    }
+    pag.classList.remove('d-none');
+    pag.innerHTML = `
+        <ul class="pagination justify-content-center mb-0">
+            <li class="page-item ${docsPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#docs" data-page="${docsPage - 1}" aria-label="Предыдущая страница">&laquo;</a></li>
+            ${Array.from({ length: pages }, (_, i) => `
+                <li class="page-item ${i + 1 === docsPage ? 'active' : ''}"><a class="page-link" href="#docs" data-page="${i + 1}">${i + 1}</a></li>`).join('')}
+            <li class="page-item ${docsPage === pages ? 'disabled' : ''}"><a class="page-link" href="#docs" data-page="${docsPage + 1}" aria-label="Следующая страница">&raquo;</a></li>
+        </ul>`;
+}
+
 async function loadDocs() {
     const container = document.getElementById('docsContainer');
     const loader = document.getElementById('docsLoader');
     if (!container) return;
 
     try {
-        const items = await loadJson('data/docs.json');
-        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
+        docsItems = await loadJson('data/docs.json');
+        if (!Array.isArray(docsItems) || docsItems.length === 0) throw new Error('empty');
 
         loader?.remove();
-        renderInto('docsContainer', items.map(item => `
-            <div class="col-md-6 col-lg-3 reveal">
-                <div class="glass-card h-100 p-4 text-center">
-                    <div class="icon-bubble"><i class="fas ${escapeHtml(item.icon || 'fa-file-lines')} fa-2x"></i></div>
-                    <h5>${escapeHtml(item.title)}</h5>
-                    <p class="text-muted small">${escapeHtml(item.text || '')}</p>
-                    ${item.link
-                        ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">${escapeHtml(item.linkText || 'Открыть')}</a>`
-                        : (item.badge ? `<span class="badge text-bg-${escapeHtml(item.badgeColor || 'warning')}">${escapeHtml(item.badge)}</span>` : '')}
-                </div>
-            </div>
-        `).join(''));
+        renderDocsPage();
+        document.getElementById('docsPagination')?.addEventListener('click', e => {
+            const link = e.target.closest('a[data-page]');
+            if (!link) return;
+            e.preventDefault();
+            const page = +link.dataset.page;
+            if (page < 1 || page > Math.ceil(docsItems.length / DOCS_PER_PAGE) || page === docsPage) return;
+            docsPage = page;
+            renderDocsPage();
+            document.getElementById('docs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
     } catch (error) {
         loader?.remove();
         renderInto('docsContainer', placeholderBlock('fa-file-lines', 'Документы скоро появятся', 'Устав, политика обработки данных и отчёты будут опубликованы здесь.'));
