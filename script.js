@@ -258,7 +258,7 @@ function renderDocsPage() {
                 <h5>${escapeHtml(item.title)}</h5>
                 <p class="text-muted small">${escapeHtml(item.text || '')}</p>
                 <div class="mt-auto d-flex flex-column gap-2">
-                    ${item.badge ? `<div class="doc-st"><i></i>${escapeHtml(item.badge)}</div>` : ''}
+                    ${item.badge ? `<div class="doc-st st-${escapeHtml(item.statusColor || 'green')}"><i></i>${escapeHtml(item.badge)}</div>` : ''}
                     ${item.link ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">${escapeHtml(item.linkText || 'Открыть')}</a>` : ''}
                 </div>
             </div>

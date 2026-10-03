@@ -117,6 +117,7 @@ function sanitizeItems(string $section, array $items): array {
                 'text' => $str($item['text'] ?? '', MAX_TEXT),
                 'icon' => in_array($icon, $icons, true) ? $icon : 'fa-file-lines',
                 'badgeColor' => in_array($item['badgeColor'] ?? '', ['warning', 'secondary', 'success', 'primary'], true) ? $item['badgeColor'] : 'warning',
+                'statusColor' => in_array($item['statusColor'] ?? '', ['green', 'red', 'orange', 'yellow', 'purple'], true) ? $item['statusColor'] : 'green',
             ];
             $tag = $str($item['tag'] ?? '', 30);
             if ($tag !== '') $entry['tag'] = $tag;

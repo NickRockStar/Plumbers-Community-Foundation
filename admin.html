@@ -241,8 +241,9 @@ const FIELDS = {
         {key: 'link', label: 'Ссылка (ustav.html или https://…), необязательно'},
         {key: 'linkText', label: 'Текст кнопки (напр. Открыть), необязательно', max: 100},
         {key: 'badge', label: 'Статус (напр. Действующая редакция), необязательно', max: 100},
-        {key: 'badgeColor', label: 'Цвет статуса', type: 'select', options: [
-            ['warning', 'Жёлтый'], ['secondary', 'Серый'], ['success', 'Зелёный'], ['primary', 'Синий']
+        {key: 'statusColor', label: 'Цвет статуса', type: 'select', options: [
+            ['green', 'Зелёный'], ['red', 'Красный'], ['orange', 'Оранжевый'],
+            ['yellow', 'Жёлтый'], ['purple', 'Фиолетовый']
         ]}
     ]
 };
@@ -455,7 +456,7 @@ document.addEventListener('click', async e => {
         const s = addBtn.dataset.add;
         const blank = s === 'news' ? {title: '', description: '', date: new Date().toISOString().slice(0, 10), link: '', source: {name: '', link: ''}}
                      : s === 'projects' ? {title: '', text: '', image: 'images/master-class.svg'}
-                     : s === 'docs' ? {title: '', text: '', tag: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning'}
+                     : s === 'docs' ? {title: '', text: '', tag: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning', statusColor: 'green'}
                      : s === 'mission' ? {quote: ''}
                      : s === 'values' ? {title: '', text: '', icon: 'fa-heart'}
                      : s === 'stats' ? {value: '0', suffix: '', label: ''}
