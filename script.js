@@ -436,10 +436,27 @@ document.getElementById('contactForm').addEventListener('submit', async function
     }
 });
 
-function donate() {
+// Виджет пожертвования: выбор суммы и отправка
+const donAmounts = document.querySelectorAll('#donAmounts [data-amount]');
+const donCustom = document.getElementById('donCustom');
+let donValue = 1000;
+function setDonAmount(v) {
+    donValue = v;
+    donAmounts.forEach(b => b.classList.toggle('active', +b.dataset.amount === v));
+    if (donCustom) donCustom.value = '';
+}
+donAmounts.forEach(b => b.addEventListener('click', () => setDonAmount(+b.dataset.amount)));
+donCustom?.addEventListener('input', () => {
+    donValue = parseInt(donCustom.value, 10) || 0;
+    donAmounts.forEach(b => b.classList.remove('active'));
+});
+document.getElementById('donateSubmit')?.addEventListener('click', () => donate(donValue));
+
+function donate(amount) {
     toastEl.classList.remove('text-bg-success', 'text-bg-danger');
     toastEl.classList.add('text-bg-primary');
-    toastText.textContent = 'Приём пожертвований откроется после регистрации сбора в реестре. Пока помогайте волонтёрством!';
+    const sum = amount ? ' на ' + amount.toLocaleString('ru-RU') + ' ₽' : '';
+    toastText.textContent = 'Спасибо! Сбор' + sum + ' откроется после регистрации общественного сбора. Пока помогайте волонтёрством!';
     toast.show();
     setTimeout(() => {
         toastEl.classList.remove('text-bg-primary');
