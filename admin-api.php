@@ -9,7 +9,7 @@ ini_set('display_errors', '0');
 require __DIR__ . '/feeds-lib.php';
 
 const DATA_DIR = __DIR__ . '/data';
-const SECTIONS = ['about', 'mission', 'directions', 'projects', 'news', 'docs'];
+const SECTIONS = ['about', 'mission', 'values', 'directions', 'projects', 'news', 'docs'];
 const MAX_ITEMS = 50;
 // Лимиты текста согласованы с maxlength полей в admin.html и гарантируют вёрстку карточек
 const MAX_TEXT = 500;
@@ -70,6 +70,17 @@ function sanitizeItems(string $section, array $items): array {
             if (!empty($item['link'])) {
                 $entry['link'] = filter_var($str($item['link'], 500), FILTER_VALIDATE_URL) ?: '';
             }
+            if ($entry['title'] === '') continue;
+            $clean[] = $entry;
+        } elseif ($section === 'values') {
+            // Ценности в блоке «О нас»: короткие карточки с иконкой из белого списка
+            $icons = ['fa-graduation-cap', 'fa-hands-helping', 'fa-heart', 'fa-award', 'fa-tools', 'fa-shield-alt', 'fa-users', 'fa-star'];
+            $icon = $str($item['icon'] ?? '', 60);
+            $entry = [
+                'title' => $str($item['title'] ?? '', 60),
+                'text' => $str($item['text'] ?? '', 200),
+                'icon' => in_array($icon, $icons, true) ? $icon : 'fa-heart',
+            ];
             if ($entry['title'] === '') continue;
             $clean[] = $entry;
         } elseif ($section === 'mission') {

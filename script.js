@@ -288,6 +288,31 @@ async function loadDocs() {
     }
 }
 
+// Ценности в блоке «О нас»: карточки из data/values.json
+async function loadValues() {
+    const container = document.getElementById('valuesContainer');
+    const loader = document.getElementById('valuesLoader');
+    if (!container) return;
+    try {
+        const items = await loadJson('data/values.json');
+        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
+
+        loader?.remove();
+        renderInto('valuesContainer', items.map(item => `
+            <div class="col-md-3 col-6 reveal">
+                <div class="glass-card h-100 p-3 text-center">
+                    <div class="icon-bubble mb-2"><i class="fas ${escapeHtml(item.icon || 'fa-heart')}"></i></div>
+                    <h6 class="mb-1">${escapeHtml(item.title)}</h6>
+                    <p class="text-muted small mb-0">${escapeHtml(item.text || '')}</p>
+                </div>
+            </div>
+        `).join(''));
+    } catch (error) {
+        loader?.remove();
+        renderInto('valuesContainer', placeholderBlock('fa-heart', 'Наши ценности скоро появятся', 'Принципы, на которых держится сообщество, будут описаны здесь.'));
+    }
+}
+
 // Миссия: цитата подменяется из data/mission.json; без данных остаётся текст из разметки
 async function loadMission() {
     const el = document.getElementById('missionQuote');
@@ -325,6 +350,7 @@ async function loadDirections() {
 }
 
 loadAbout();
+loadValues();
 loadMission();
 loadDirections();
 loadProjects();
