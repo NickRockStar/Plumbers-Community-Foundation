@@ -73,7 +73,7 @@ function sanitizeItems(string $section, array $items): array {
             if ($entry['title'] === '') continue;
             $clean[] = $entry;
         } elseif ($section === 'docs') {
-            // Документы блока «Прозрачность»: иконка из белого списка, статусные бейджи
+            // Документы блока «Открытые данные фонда»: иконка из белого списка, тег и статус
             $icons = ['fa-file-lines', 'fa-shield-halved', 'fa-chart-column', 'fa-landmark', 'fa-file-pdf', 'fa-hand-holding-heart', 'fa-book-open'];
             $icon = $str($item['icon'] ?? '', 60);
             $link = $str($item['link'] ?? '', 500);
@@ -83,6 +83,8 @@ function sanitizeItems(string $section, array $items): array {
                 'icon' => in_array($icon, $icons, true) ? $icon : 'fa-file-lines',
                 'badgeColor' => in_array($item['badgeColor'] ?? '', ['warning', 'secondary', 'success', 'primary'], true) ? $item['badgeColor'] : 'warning',
             ];
+            $tag = $str($item['tag'] ?? '', 30);
+            if ($tag !== '') $entry['tag'] = $tag;
             if ($link !== '') $entry['link'] = $link;
             $linkText = $str($item['linkText'] ?? '', 100);
             if ($linkText !== '') $entry['linkText'] = $linkText;

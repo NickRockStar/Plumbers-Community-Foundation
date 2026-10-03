@@ -1,30 +1,76 @@
 [
     {
+        "title": "Заполним все поля",
+        "text": "Заполняем все поля",
+        "icon": "fa-shield-halved",
+        "badgeColor": "warning",
+        "link": "https://skillbox.ru/media/",
+        "linkText": "skillbox",
+        "badge": "Обучение"
+    },
+    {
+        "title": "Поможем",
+        "text": "Поможем стать сильнее",
+        "icon": "fa-hand-holding-heart",
+        "badgeColor": "secondary",
+        "linkText": "Обучение",
+        "badge": "Учимся"
+    },
+    {
+        "title": "Обучаем",
+        "text": "Мы научим вас всему, чему умеем",
+        "icon": "fa-book-open",
+        "badgeColor": "success",
+        "badge": "Обучение"
+    },
+    {
+        "title": "PDF-файл",
+        "text": "Тут файлик",
+        "icon": "fa-file-pdf",
+        "badgeColor": "secondary",
+        "badge": "ФАЙЛ"
+    },
+    {
+        "title": "Важный документ",
+        "text": "Тут важный документ",
+        "icon": "fa-file-lines",
+        "badgeColor": "warning",
+        "badge": "Документ"
+    },
+    {
         "title": "Устав сообщества",
         "text": "Действующая редакция — цели, членство и управление.",
         "icon": "fa-file-lines",
+        "badgeColor": "warning",
         "link": "ustav.html",
-        "linkText": "Открыть"
+        "linkText": "Открыть",
+        "tag": "Документ",
+        "badge": "Действующая редакция"
     },
     {
         "title": "Политика данных",
         "text": "Обработка персональных данных по 152-ФЗ.",
         "icon": "fa-shield-halved",
+        "badgeColor": "warning",
         "link": "politika.html",
-        "linkText": "Читать"
+        "linkText": "Читать",
+        "tag": "152-ФЗ",
+        "badge": "Действующая редакция"
     },
     {
         "title": "Отчёты о деятельности",
         "text": "Публикуем итоги и использование средств.",
         "icon": "fa-chart-column",
+        "badgeColor": "warning",
         "badge": "Готовится к публикации",
-        "badgeColor": "warning"
+        "tag": "Отчёты"
     },
     {
         "title": "Реквизиты",
         "text": "Будут открыты после регистрации НКО.",
         "icon": "fa-landmark",
+        "badgeColor": "secondary",
         "badge": "После регистрации",
-        "badgeColor": "secondary"
+        "tag": "Реквизиты"
     }
 ]

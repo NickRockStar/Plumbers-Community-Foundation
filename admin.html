@@ -161,6 +161,7 @@ const FIELDS = {
     docs: [
         {key: 'title', label: 'Заголовок', max: 100},
         {key: 'text', label: 'Описание', type: 'textarea', max: 500},
+        {key: 'tag', label: 'Тег на карточке (напр. 152-ФЗ), необязательно', max: 30},
         {key: 'icon', label: 'Иконка', type: 'select', options: [
             ['fa-file-lines', 'Документ'], ['fa-file-pdf', 'PDF-файл'], ['fa-shield-halved', 'Защита данных'],
             ['fa-chart-column', 'Отчёт / статистика'], ['fa-landmark', 'Организация'],
@@ -168,8 +169,8 @@ const FIELDS = {
         ]},
         {key: 'link', label: 'Ссылка (ustav.html или https://…), необязательно'},
         {key: 'linkText', label: 'Текст кнопки (напр. Открыть), необязательно', max: 100},
-        {key: 'badge', label: 'Бейдж статуса (необязательно)', max: 100},
-        {key: 'badgeColor', label: 'Цвет бейджа', type: 'select', options: [
+        {key: 'badge', label: 'Статус (напр. Действующая редакция), необязательно', max: 100},
+        {key: 'badgeColor', label: 'Цвет статуса', type: 'select', options: [
             ['warning', 'Жёлтый'], ['secondary', 'Серый'], ['success', 'Зелёный'], ['primary', 'Синий']
         ]}
     ]
@@ -369,7 +370,7 @@ document.addEventListener('click', async e => {
         const s = addBtn.dataset.add;
         const blank = s === 'news' ? {title: '', description: '', date: new Date().toISOString().slice(0, 10), link: '', source: {name: '', link: ''}}
                      : s === 'projects' ? {title: '', text: '', image: 'images/master-class.svg'}
-                     : s === 'docs' ? {title: '', text: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning'}
+                     : s === 'docs' ? {title: '', text: '', tag: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning'}
                      : {title: '', text: ''};
         state[s].unshift(blank);
         renderSection(s);
