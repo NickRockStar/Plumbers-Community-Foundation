@@ -231,15 +231,18 @@ function renderDocsPage() {
 
     renderInto('docsContainer', docsItems.slice(start, start + DOCS_PER_PAGE).map(item => `
         <div class="col-md-6 col-lg-3 reveal">
-            <article class="doc-card h-100 reveal">
-                <div class="doc-ph"><i class="fas ${escapeHtml(item.icon || 'fa-file-lines')} fa-2x"></i>${item.tag ? `<span class="doc-tag">${escapeHtml(item.tag)}</span>` : ''}</div>
-                <div class="doc-bd">
-                    <h5>${escapeHtml(item.title)}</h5>
-                    <p class="text-muted small">${escapeHtml(item.text || '')}</p>
-                    ${item.badge ? `<div class="doc-st"><i></i>${escapeHtml(item.badge)}</div>` : ''}
-                    ${item.link ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm mt-auto">${escapeHtml(item.linkText || 'Открыть')}</a>` : ''}
+            <div class="glass-card doc-card h-100 p-4 d-flex flex-column">
+                <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                    <div class="icon-bubble mb-0"><i class="fas ${escapeHtml(item.icon || 'fa-file-lines')} fa-2x"></i></div>
+                    ${item.tag ? `<span class="doc-tag">${escapeHtml(item.tag)}</span>` : ''}
                 </div>
-            </article>
+                <h5>${escapeHtml(item.title)}</h5>
+                <p class="text-muted small">${escapeHtml(item.text || '')}</p>
+                <div class="mt-auto d-flex flex-column gap-2">
+                    ${item.badge ? `<div class="doc-st"><i></i>${escapeHtml(item.badge)}</div>` : ''}
+                    ${item.link ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">${escapeHtml(item.linkText || 'Открыть')}</a>` : ''}
+                </div>
+            </div>
         </div>
     `).join(''));
 
