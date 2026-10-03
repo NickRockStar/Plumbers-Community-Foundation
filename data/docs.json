@@ -1,0 +1,30 @@
+[
+    {
+        "title": "Устав сообщества",
+        "text": "Действующая редакция — цели, членство и управление.",
+        "icon": "fa-file-lines",
+        "link": "ustav.html",
+        "linkText": "Открыть"
+    },
+    {
+        "title": "Политика данных",
+        "text": "Обработка персональных данных по 152-ФЗ.",
+        "icon": "fa-shield-halved",
+        "link": "politika.html",
+        "linkText": "Читать"
+    },
+    {
+        "title": "Отчёты о деятельности",
+        "text": "Публикуем итоги и использование средств.",
+        "icon": "fa-chart-column",
+        "badge": "Готовится к публикации",
+        "badgeColor": "warning"
+    },
+    {
+        "title": "Реквизиты",
+        "text": "Будут открыты после регистрации НКО.",
+        "icon": "fa-landmark",
+        "badge": "После регистрации",
+        "badgeColor": "secondary"
+    }
+]

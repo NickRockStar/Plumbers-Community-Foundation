@@ -12,6 +12,34 @@ const observer = new IntersectionObserver(entries => {
 
 reveals.forEach(el => observer.observe(el));
 
+// Анимированные счётчики статистики: 0 -> data-count при появлении на экране
+function animateCounter(el) {
+    if (el.dataset.done) return;
+    el.dataset.done = '1';
+    const target = parseInt(el.dataset.count, 10) || 0;
+    const suffix = el.dataset.suffix || '';
+    const start = performance.now();
+    const duration = 1200;
+    const step = now => {
+        const p = Math.min((now - start) / duration, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
+        if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+const counterObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            counterObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.4 });
+document.querySelectorAll('.stat-num[data-count]').forEach(el => {
+    el.textContent = '0' + (el.dataset.suffix || '');
+    counterObserver.observe(el);
+});
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const hash = this.getAttribute('href');
@@ -189,9 +217,38 @@ async function loadNews() {
     }
 }
 
+async function loadDocs() {
+    const container = document.getElementById('docsContainer');
+    const loader = document.getElementById('docsLoader');
+    if (!container) return;
+
+    try {
+        const items = await loadJson('data/docs.json');
+        if (!Array.isArray(items) || items.length === 0) throw new Error('empty');
+
+        loader?.remove();
+        renderInto('docsContainer', items.map(item => `
+            <div class="col-md-6 col-lg-3 reveal">
+                <div class="glass-card h-100 p-4 text-center">
+                    <div class="icon-bubble"><i class="fas ${escapeHtml(item.icon || 'fa-file-lines')} fa-2x"></i></div>
+                    <h5>${escapeHtml(item.title)}</h5>
+                    <p class="text-muted small">${escapeHtml(item.text || '')}</p>
+                    ${item.link
+                        ? `<a href="${encodeURI(item.link)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">${escapeHtml(item.linkText || 'Открыть')}</a>`
+                        : (item.badge ? `<span class="badge text-bg-${escapeHtml(item.badgeColor || 'warning')}">${escapeHtml(item.badge)}</span>` : '')}
+                </div>
+            </div>
+        `).join(''));
+    } catch (error) {
+        loader?.remove();
+        renderInto('docsContainer', placeholderBlock('fa-file-lines', 'Документы скоро появятся', 'Устав, политика обработки данных и отчёты будут опубликованы здесь.'));
+    }
+}
+
 loadAbout();
 loadProjects();
 loadNews();
+loadDocs();
 
 // Open all external links in a new tab (internal #anchor navigation stays in-tab)
 document.querySelectorAll('a[href^="http"]').forEach(a => {

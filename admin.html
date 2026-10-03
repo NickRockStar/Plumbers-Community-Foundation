@@ -44,6 +44,7 @@
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-about" type="button">О нас</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-projects" type="button">Проекты и мероприятия</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-news" type="button">Новости</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-docs" type="button">Документы</button></li>
     </ul>
 
     <!-- О нас -->
@@ -82,6 +83,18 @@
                 </div>
             </div>
             <div id="list-news"></div>
+        </div>
+
+        <!-- Документы -->
+        <div class="tab-pane fade" id="tab-docs">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <span class="text-muted small">Карточки раздела «Прозрачность и документы» на главной</span>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" data-add="docs"><i class="fas fa-plus me-1"></i>Добавить</button>
+                    <button class="btn btn-success btn-sm" data-save="docs"><i class="fas fa-save me-1"></i>Сохранить «Документы»</button>
+                </div>
+            </div>
+            <div id="list-docs"></div>
         </div>
     </div>
 </div>
@@ -144,9 +157,24 @@ const FIELDS = {
         {key: 'link', label: 'Ссылка «Читать» https://… (необязательно)'},
         {key: 'source.name', label: 'Источник — название (напр. РБК)'},
         {key: 'source.link', label: 'Источник — ссылка https://… (необязательно)'}
+    ],
+    docs: [
+        {key: 'title', label: 'Заголовок', max: 100},
+        {key: 'text', label: 'Описание', type: 'textarea', max: 500},
+        {key: 'icon', label: 'Иконка', type: 'select', options: [
+            ['fa-file-lines', 'Документ'], ['fa-file-pdf', 'PDF-файл'], ['fa-shield-halved', 'Защита данных'],
+            ['fa-chart-column', 'Отчёт / статистика'], ['fa-landmark', 'Организация'],
+            ['fa-hand-holding-heart', 'Помощь'], ['fa-book-open', 'Знания / обучение']
+        ]},
+        {key: 'link', label: 'Ссылка (ustav.html или https://…), необязательно'},
+        {key: 'linkText', label: 'Текст кнопки (напр. Открыть), необязательно', max: 100},
+        {key: 'badge', label: 'Бейдж статуса (необязательно)', max: 100},
+        {key: 'badgeColor', label: 'Цвет бейджа', type: 'select', options: [
+            ['warning', 'Жёлтый'], ['secondary', 'Серый'], ['success', 'Зелёный'], ['primary', 'Синий']
+        ]}
     ]
 };
-const state = {about: [], projects: [], news: []};
+const state = {about: [], projects: [], news: [], docs: []};
 const toastEl = document.getElementById('adminToast');
 const toastText = document.getElementById('adminToastText');
 const toast = bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 2500});
@@ -225,7 +253,7 @@ function renderSection(section) {
         : '<div class="alert alert-light text-muted mb-0">Пока нет ни одного блока — нажмите «Добавить».</div>';
 }
 
-function renderAll() { ['about', 'projects', 'news'].forEach(renderSection); }
+function renderAll() { ['about', 'projects', 'news', 'docs'].forEach(renderSection); }
 
 // Collect form values back into state before save
 function collect(section) {
@@ -291,6 +319,7 @@ async function loadData() {
             state.about = data.about || [];
             state.projects = data.projects || [];
             state.news = data.news || [];
+            state.docs = data.docs || [];
             renderAll();
         } else {
             notify(message || 'Не удалось загрузить данные. Обновите страницу.', false);
@@ -322,6 +351,10 @@ function validateSection(section) {
             const link = get('link');
             if (link && link.value.trim() && !isUrl(link.value.trim())) bad(link, 'ссылка «Подробнее» должна начинаться с http:// или https://');
         }
+        if (section === 'docs') {
+            const link = get('link');
+            if (link && link.value.trim() && (/\s/.test(link.value.trim()) || /^javascript:/i.test(link.value.trim()))) bad(link, 'ссылка без пробелов: ustav.html или https://…');
+        }
         if (section === 'about') {
             const lv = get('linkValue');
             if (lv && lv.value.trim() && !/^(#|https?:\/\/)/i.test(lv.value.trim())) bad(lv, 'ссылка должна начинаться с http://, https:// или с # (для устава)');
@@ -336,6 +369,7 @@ document.addEventListener('click', async e => {
         const s = addBtn.dataset.add;
         const blank = s === 'news' ? {title: '', description: '', date: new Date().toISOString().slice(0, 10), link: '', source: {name: '', link: ''}}
                      : s === 'projects' ? {title: '', text: '', image: 'images/master-class.svg'}
+                     : s === 'docs' ? {title: '', text: '', icon: 'fa-file-lines', link: '', linkText: '', badge: '', badgeColor: 'warning'}
                      : {title: '', text: ''};
         state[s].unshift(blank);
         renderSection(s);

@@ -9,7 +9,7 @@ ini_set('display_errors', '0');
 require __DIR__ . '/feeds-lib.php';
 
 const DATA_DIR = __DIR__ . '/data';
-const SECTIONS = ['about', 'projects', 'news'];
+const SECTIONS = ['about', 'projects', 'news', 'docs'];
 const MAX_ITEMS = 50;
 // Лимиты текста согласованы с maxlength полей в admin.html и гарантируют вёрстку карточек
 const MAX_TEXT = 500;
@@ -70,6 +70,24 @@ function sanitizeItems(string $section, array $items): array {
             if (!empty($item['link'])) {
                 $entry['link'] = filter_var($str($item['link'], 500), FILTER_VALIDATE_URL) ?: '';
             }
+            if ($entry['title'] === '') continue;
+            $clean[] = $entry;
+        } elseif ($section === 'docs') {
+            // Документы блока «Прозрачность»: иконка из белого списка, статусные бейджи
+            $icons = ['fa-file-lines', 'fa-shield-halved', 'fa-chart-column', 'fa-landmark', 'fa-file-pdf', 'fa-hand-holding-heart', 'fa-book-open'];
+            $icon = $str($item['icon'] ?? '', 60);
+            $link = $str($item['link'] ?? '', 500);
+            $entry = [
+                'title' => $str($item['title'] ?? '', MAX_TITLE),
+                'text' => $str($item['text'] ?? '', MAX_TEXT),
+                'icon' => in_array($icon, $icons, true) ? $icon : 'fa-file-lines',
+                'badgeColor' => in_array($item['badgeColor'] ?? '', ['warning', 'secondary', 'success', 'primary'], true) ? $item['badgeColor'] : 'warning',
+            ];
+            if ($link !== '') $entry['link'] = $link;
+            $linkText = $str($item['linkText'] ?? '', 100);
+            if ($linkText !== '') $entry['linkText'] = $linkText;
+            $badge = $str($item['badge'] ?? '', 100);
+            if ($badge !== '') $entry['badge'] = $badge;
             if ($entry['title'] === '') continue;
             $clean[] = $entry;
         } else { // news
