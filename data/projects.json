@@ -1,58 +1,20 @@
 [
     {
-        "title": "Команда",
-        "text": "Наша команда",
-        "image": "images\/project-team.svg",
+        "title": "Картинка из интернета",
+        "text": "Добавлю картинку из интернета",
+        "image": "https:\/\/static.vecteezy.com\/system\/resources\/thumbnails\/046\/446\/501\/small_2x\/pipa-air-mengeluarkan-air-vector.jpg",
         "badge": {
-            "text": "КОМАНДА",
-            "type": "danger"
+            "text": "Картинка",
+            "type": "warning"
         }
     },
     {
-        "title": "Тест внешней картинки",
-        "text": "Проверка URL",
-        "image": "https:\/\/www.shutterstock.com\/shutterstock\/photos\/705650296\/display_1500\/stock-vector-sewerage-water-system-flat-design-705650296.jpg",
-        "badge": {
-            "text": "123",
-            "type": "info"
-        }
-    },
-    {
-        "title": "Тусовка",
-        "text": "Тусили до утра !",
-        "image": "images\/community-meet.svg",
-        "badge": {
-            "text": "ТУСА !",
-            "type": "secondary"
-        }
-    },
-    {
-        "title": "Водоснабжение",
-        "text": "Вы добыли воду",
-        "image": "images\/water-supply.svg"
-    },
-    {
-        "title": "Инструменты",
-        "text": "Наши инструменты",
-        "image": "images\/instruments.svg"
-    },
-    {
-        "title": "Благотворительность",
-        "text": "Мы делаем хорошие дела !",
+        "title": "Так ребята готовьте деньги !",
+        "text": "Нужно скинуться на ремонт кранов и бла бла",
         "image": "images\/charity.svg",
         "badge": {
-            "text": "ДОБРО !.",
-            "type": "primary"
+            "text": "ВНИМАНИЕ !",
+            "type": "danger"
         }
-    },
-    {
-        "title": "Мастер класс",
-        "text": "Текст о мастере класса",
-        "image": "images\/master-class.svg",
-        "badge": {
-            "text": "МАСТЕР КЛАСС",
-            "type": "warning"
-        },
-        "link": "https:\/\/texter.ru\/generate-letters"
     }
 ]
