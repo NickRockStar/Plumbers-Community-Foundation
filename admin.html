@@ -571,20 +571,21 @@ document.addEventListener('change', e => {
 });
 
 // Превью суффикса статистики: число + суффикс, как будет выглядеть на сайте
-function updateStatPreview(box) {
-    const value = box?.querySelector('[data-k="value"]');
-    const suffix = box?.querySelector('[data-k="suffix"]');
-    const prev = box?.querySelector('[data-stat-preview]');
+function updateStatPreview(card) {
+    // число и суффикс с превью лежат в разных .mb-2 — ищем в масштабе всей карточки
+    const value = card?.querySelector('[data-k="value"]');
+    const suffix = card?.querySelector('[data-k="suffix"]');
+    const prev = card?.querySelector('[data-stat-preview]');
     if (!value || !suffix || !prev) return;
     prev.textContent = (parseInt(value.value, 10) || 0) + suffix.value;
 }
 document.addEventListener('change', e => {
     const suffix = e.target.closest('select[data-k="suffix"]');
-    if (suffix) updateStatPreview(suffix.closest('.mb-2'));
+    if (suffix) updateStatPreview(suffix.closest('.item-card'));
 });
 document.addEventListener('input', e => {
     const value = e.target.closest('[data-k="value"]');
-    if (value) updateStatPreview(value.closest('.mb-2'));
+    if (value) updateStatPreview(value.closest('.item-card'));
 });
 
 // Живые счётчики символов для полей с лимитом; заодно снимаем подсветку ошибки при исправлении
