@@ -13,6 +13,9 @@
         .item-card.drag-over{border-color:var(--primary)}
         .handle{cursor:grab;color:#94a3b8}
         .toast-pos{position:fixed;bottom:18px;right:18px;z-index:1090}
+        /* Превью иконок и суффикса — как элементы выглядят на сайте */
+        .doc-ph-preview{width:100%;max-width:230px;height:74px;border-radius:.9rem .9rem 0 0;background:linear-gradient(135deg,var(--primary),var(--primary-2));display:grid;place-items:center;color:#fff}
+        .stat-num-preview{font-size:2.2rem}
     </style>
 </head>
 <body>
@@ -300,7 +303,14 @@ function itemForm(section, index) {
                 const [value, label] = Array.isArray(o) ? o : [o, o];
                 return `<option value="${value}" ${value === val ? 'selected' : ''}>${label}</option>`;
             }).join('');
-            return `<div class="mb-2">${labelRow}<select class="form-select" data-k="${f.key}">${opts}</select></div>`;
+            let preview = '';
+            if (section === 'values' && f.key === 'icon') preview = `<div class="icon-bubble mt-2" data-icon-preview><i class="fas ${val}"></i></div>`;
+            if (section === 'docs' && f.key === 'icon') preview = `<div class="doc-ph-preview mt-2" data-icon-preview data-icon-size="fa-2x"><i class="fas ${val} fa-2x"></i></div>`;
+            if (section === 'stats' && f.key === 'suffix') {
+                const num = parseInt(get(item, 'value'), 10) || 0;
+                preview = `<div class="stat-num stat-num-preview mt-2" data-stat-preview>${num}${val}</div>`;
+            }
+            return `<div class="mb-2">${labelRow}<select class="form-select" data-k="${f.key}">${opts}</select>${preview}</div>`;
         }
         return `<div class="mb-2">${labelRow}<input class="form-control" data-k="${f.key}" value="${String(val).replace(/"/g, '&quot;')}"${maxAttr}></div>`;
     }).join('');
@@ -547,6 +557,34 @@ document.addEventListener('input', e => {
     if (!input) return;
     clearTimeout(imagePreviewTimer);
     imagePreviewTimer = setTimeout(() => refreshImagePreview(input.closest('.mb-2')), 400);
+});
+
+// Превью иконки (Ценности/Документы): смена иконки в select обновляет миниатюру
+document.addEventListener('change', e => {
+    const iconSel = e.target.closest('select[data-k="icon"]');
+    if (!iconSel) return;
+    const box = iconSel.closest('.mb-2');
+    const prev = box?.querySelector('[data-icon-preview]');
+    if (!prev) return;
+    const i = prev.querySelector('i');
+    if (i) i.className = 'fas ' + iconSel.value + (prev.dataset.iconSize ? ' ' + prev.dataset.iconSize : '');
+});
+
+// Превью суффикса статистики: число + суффикс, как будет выглядеть на сайте
+function updateStatPreview(box) {
+    const value = box?.querySelector('[data-k="value"]');
+    const suffix = box?.querySelector('[data-k="suffix"]');
+    const prev = box?.querySelector('[data-stat-preview]');
+    if (!value || !suffix || !prev) return;
+    prev.textContent = (parseInt(value.value, 10) || 0) + suffix.value;
+}
+document.addEventListener('change', e => {
+    const suffix = e.target.closest('select[data-k="suffix"]');
+    if (suffix) updateStatPreview(suffix.closest('.mb-2'));
+});
+document.addEventListener('input', e => {
+    const value = e.target.closest('[data-k="value"]');
+    if (value) updateStatPreview(value.closest('.mb-2'));
 });
 
 // Живые счётчики символов для полей с лимитом; заодно снимаем подсветку ошибки при исправлении
